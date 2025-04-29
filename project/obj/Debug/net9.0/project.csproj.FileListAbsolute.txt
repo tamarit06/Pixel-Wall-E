@@ -1,0 +1,15 @@
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\bin\Debug\net9.0\project.exe
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\bin\Debug\net9.0\project.deps.json
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\bin\Debug\net9.0\project.runtimeconfig.json
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\bin\Debug\net9.0\project.dll
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\bin\Debug\net9.0\project.pdb
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.AssemblyInfoInputs.cache
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.AssemblyInfo.cs
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.csproj.CoreCompileInputs.cache
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.sourcelink.json
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.dll
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\refint\project.dll
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.pdb
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\project.genruntimeconfig.cache
+C:\Users\HOME\Documents\GitHub\Pixel-Wall-E\project\obj\Debug\net9.0\ref\project.dll
