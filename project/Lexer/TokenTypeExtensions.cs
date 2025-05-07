@@ -13,12 +13,10 @@ public class TokenTypeExtensions
          TokenGeneral = new()
         {
             { TokenType.Number, @"^\b\d+\b" },
-            { TokenType.Identifier, @"\b[A-Z][a-zA-Z]*\b"},
+           { TokenType.Identifier, @"^[A-Z][a-zA-Z]*" },
             {TokenType.Color,"^\"[^\"]*\""},
             {TokenType.AssigmentExpresions, @"^\<-"  },
             {TokenType.GoTo, @"^GoTo"},
-            {TokenType.VariableLebel,  @"^[a-zA-ZñÑ][a-zA-Z0-9ñÑ-]*$"},
-
 
             //aritmetic expressions
             { TokenType.Plus, @"^\+" },
@@ -72,7 +70,6 @@ public class TokenTypeExtensions
         Color,
         AssigmentExpresions,
         GoTo,
-       VariableLebel,
         
         //aritmetic expressions
          Plus, Minus, Multiply, Divide,Pow, Modulus,
@@ -86,30 +83,5 @@ public class TokenTypeExtensions
         Desconocido,
     }
   
-  /*  public enum TokenType
-    {
-       //keywords
-       GoTo,
-
-       //intructions
-       Spawn, Color, Size, DrawLine, DrawCircle, DrawRectangle, Fill, 
-
-       //arithmetic expressions
-       Sum, Subtraction, Multiplication, Division,Pow, Modulus,
-
-       //boolean expression
-       And, Or, Equal, less, lessOrEqual, greather, greatherOrEqual,
-
-       //functions
-       GetActualX, GetActualY, GetCanvasSize, GetColorCount, IsBrushColor, IsBrushSize, IsCanvasColor,
-
-       //assigment expresions
-       assignment,
-
-        //colors
-       Red, Blue, Green, Yellow, Orange, Purple, Black, White, Transparent,
-
-       //Symbols
-        Hyphen, OpenBracket, CloseBracket, OpenParenthesis, CloseParenthesis, Comma, DoubleQuote,
-    }*/
+  
 }

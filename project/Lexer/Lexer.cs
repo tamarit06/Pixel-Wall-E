@@ -39,7 +39,7 @@ public class Lexer
 
     Console.WriteLine($"Probando patrón: {entry.Key} en '{Input.Substring(Position)}'");
 
-    if (match.Success && match.Index == 0)
+    if (match.Success && match.Index == 0  && match.Length > 0)
     {
         string value = match.Value;
         TokenType type = entry.Key;
