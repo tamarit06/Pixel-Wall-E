@@ -12,8 +12,8 @@ public class TokenTypeExtensions
     {
          TokenGeneral = new()
         {
-            { TokenType.Number, @"^\b\d+\b" },
-           { TokenType.Identifier, @"^[A-Z][a-zA-Z]*" },
+            {TokenType.Number, @"^\b\d+\b" },
+            {TokenType.Identifier, @"^[a-zA-ZñÑáéíóúÁÉÍÓÚ][a-zA-ZñÑáéíóúÁÉÍÓÚ0-9-]*" },
             {TokenType.Color,"^\"[^\"]*\""},
             {TokenType.AssigmentExpresions, @"^\<-"  },
             {TokenType.GoTo, @"^GoTo"},
@@ -45,7 +45,7 @@ public class TokenTypeExtensions
         
         };
         
-         InstruccionsValue=new HashSet<string>
+      /*   InstruccionsValue=new HashSet<string>
         {
             "Spawn", "Color", "Size", "DrawLine", "DrawCircle", "DrawRectangle", "Fill", 
         };
@@ -58,7 +58,7 @@ public class TokenTypeExtensions
         ColorValue=new HashSet<string>
         {
             "Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Black", "White", "Transparent",
-        };
+        };*/
 
     }
    

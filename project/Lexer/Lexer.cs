@@ -44,7 +44,7 @@ public class Lexer
         string value = match.Value;
         TokenType type = entry.Key;
 
-        if (entry.Key == TokenType.Identifier)
+       /* if (entry.Key == TokenType.Identifier)
         {
             if (TokenTypeExtensions.InstruccionsValue.Contains(value))
                 type =TokenType.Istructions;
@@ -58,7 +58,7 @@ public class Lexer
         else if (entry.Key == TokenType.Color &&TokenTypeExtensions.ColorValue.Contains(value.Trim('"')))
         {
             type = TokenType.Color;
-        }
+        }*/
 
         AddToken(type, value);
         Position += match.Length;
