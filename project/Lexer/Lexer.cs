@@ -32,12 +32,10 @@ public class Lexer
 
             bool matched = false;
 
-         foreach (var entry in TokenTypeExtensions.TokenGeneral)
+ foreach (var entry in TokenTypeExtensions.TokenGeneral)
 {
     var regex = new Regex(entry.Value);
     var match = regex.Match(Input.Substring(Position));
-
-    Console.WriteLine($"Probando patrón: {entry.Key} en '{Input.Substring(Position)}'");
 
     if (match.Success && match.Index == 0  && match.Length > 0)
     {

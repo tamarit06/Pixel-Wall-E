@@ -1,17 +1,18 @@
 ﻿class Program
 {
-    static void Main()
-{
-      string codigo = @"Color Size DrawCircle mama-mama , ;)";
+    static void Main(string[] args)
+    {
+        string codigoFuente = "x <- 3 + 5 * 2"; // tu código aquí
 
-        Lexer lexer = new Lexer(codigo);
-        List<Token> tokens = lexer.Tokenize();
+        Lexer lexer = new Lexer(codigoFuente);
+        lexer.Tokenize();
 
-        foreach (var token in tokens)
+        Parser parser = new Parser(lexer);
+        List<ASTnode> ast = parser.Parse();
+
+        foreach (var nodo in ast)
         {
-            Console.WriteLine(token);
+            ASTPrinter.Print(nodo);
         }
+    }
 }
-
-}
-

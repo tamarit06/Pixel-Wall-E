@@ -13,7 +13,7 @@ public class TokenTypeExtensions
          TokenGeneral = new()
         {
             {TokenType.Number, @"^\b\d+\b" },
-            {TokenType.Identifier, @"^[a-zA-ZñÑáéíóúÁÉÍÓÚ][a-zA-ZñÑáéíóúÁÉÍÓÚ0-9-]*" },
+            {TokenType.Identifier,@"^[a-zA-ZñÑáéíóúÁÉÍÓÚ][a-zA-ZñÑáéíóúÁÉÍÓÚ0-9_-]*" },
             {TokenType.Color,"^\"[^\"]*\""},
             {TokenType.AssigmentExpresions, @"^\<-"  },
             {TokenType.GoTo, @"^GoTo"},

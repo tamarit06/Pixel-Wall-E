@@ -1,5 +1,5 @@
 class Label : Statement 
 {
-    public string Name { get; }
-    public Label(string name) => Name = name;
+    public string Value{ get; }
+    public Label(string value) => Value = value;
 }

@@ -1,9 +1,9 @@
-public class UnaryExpression: Expression
+public class UnaryExpression:ASTNode
 {
     public Token Operator{get;}
-    public Expression Right{get;}
+    public ASTNode Right{get;}
 
-    public UnaryExpression(Token op, Expression right )
+    public UnaryExpression(Token op, ASTNode right )
     {
         Operator=op;
         Right=right;

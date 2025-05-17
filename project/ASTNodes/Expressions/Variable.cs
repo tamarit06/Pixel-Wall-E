@@ -1,6 +1,9 @@
-public class Variable:Expression 
+public class Variable:ASTNode
 {
     public string Name{get;}
 
-    public Variable(string name) => Name=name;
+    public Variable(Token token)
+    {
+        Name=token.Lexeme;
+    } 
 }

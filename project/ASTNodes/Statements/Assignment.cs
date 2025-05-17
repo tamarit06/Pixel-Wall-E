@@ -1,9 +1,9 @@
 public class Assignment: Statement
 {
     public string NameVariable{get;}
-    public Expression Value{get;}
+    public ASTNode Value{get;}
 
-    public Assignment(string nameVal,Expression value)
+    public Assignment(string nameVal,ASTNode value)
     {
         NameVariable=nameVal;
         Value=value;

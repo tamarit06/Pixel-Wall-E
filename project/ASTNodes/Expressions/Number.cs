@@ -1,6 +1,12 @@
-public class Number:Expression
+public class Number:ASTNode
 {
-    public double Value{get;}
+   public  Token Num{get; private set;}
+    public double Value{get; private set;}
 
-    public Number(double value)=> Value=value;
+    public Number(Token num)
+    {
+        Num=num;
+        Value=double.Parse(num.Lexeme);
+
+    }
 }
