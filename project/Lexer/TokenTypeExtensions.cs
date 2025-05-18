@@ -4,10 +4,6 @@ public class TokenTypeExtensions
 {
     public static readonly Dictionary<TokenType, string> TokenGeneral;
     
-    public static readonly HashSet<string>  InstruccionsValue;
-    public static readonly HashSet<string>  FunctionsValue;
-    public static readonly HashSet<string>  ColorValue;
-
     static TokenTypeExtensions()
     {
          TokenGeneral = new()
@@ -44,21 +40,6 @@ public class TokenTypeExtensions
 
         
         };
-        
-      /*   InstruccionsValue=new HashSet<string>
-        {
-            "Spawn", "Color", "Size", "DrawLine", "DrawCircle", "DrawRectangle", "Fill", 
-        };
-
-        FunctionsValue=new HashSet<string>
-        {
-            "GetActualX", "GetActualY", "GetCanvasSize", "GetColorCount", "IsBrushColor", "IsBrushSize", "IsCanvasColor",
-        };
-
-        ColorValue=new HashSet<string>
-        {
-            "Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Black", "White", "Transparent",
-        };*/
 
     }
    

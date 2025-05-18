@@ -17,64 +17,38 @@ public class Parser
         Nodos=new List<ASTNode>();
     }
 
-   private bool spawnUsado = false;
+   //private bool spawnUsado = false;
 
-public void Parsind()
+ public ASTNode Parsind()
 {
-    if (!IsAtEnd)
-    {
-        if (Current.Lexeme != "Spawn")
-            throw new ParserException($"El programa debe comenzar con Spawn (línea {Current.Linea})");
-
-        Nodos.Add(ParseGenericInstruction());
-        spawnUsado = true;
-    }
-
     while (!IsAtEnd)
     {
-        var stmt = ParseStatement();
+        var stmt = Primary(); // Cambia esto si necesitas otro método para parsear
         if (stmt != null)
             Nodos.Add(stmt);
     }
+
+    // Si no hay nodos, puedes lanzar una excepción o devolver un nodo vacío
+    if (Nodos.Count == 0)
+    {
+        throw new ParserException("No se encontraron nodos en la entrada.");
+    }
+
+    return Nodos[0]; // Retorna el primer nodo si existe
 }
 
-private ASTNode ParseStatement()
+
+/*private ASTNode ParseStatement()
 {
     // si es un identificador y luego abre parentesis
     if (Current.Type == TokenType.Identifier && NextIs(TokenType.OpenParen))
     {
          return ParseGenericInstruction();
-       /* switch (Current.Lexeme)
-        {
-            case "Spawn":
-                if (spawnUsado)
-                    throw new ParserException($"Solo se permite un Spawn (línea {Current.Linea})");
-                spawnUsado = true;
-                return Spawn();
-
-            case "Color":
-                return ParseColor();
-            
-            case "Size":
-            return Size();
-
-            case "DrawLine":
-            return DrawLine();
-
-            case "DrawCircle":
-            return DrawCircle();
-
-            case "DrawRectangle":
-            return DrawRectangle();
-
-            case "Fill":
-            return Fill();
-        }*/
+      
     }
 
 
-
-    if (Current.Type == TokenType.GoTo)
+ if (Current.Type == TokenType.GoTo)
     {
         return ParseGoTo();
     }
@@ -259,7 +233,7 @@ private ASTNode FunctionCall()
     Consume(TokenType.CloseParen, "Se esperaba ')'");
 
     return new FunctionCallNode(name, args);
-}
+}*/
 
 
 // 9. Literales, variables, paréntesis
@@ -271,25 +245,35 @@ private ASTNode Primary()
     if (Match(TokenType.Color))
         return new ColorNode(Advance());
 
-    if (Match(TokenType.Identifier) && NextIs(TokenType.OpenParen))
-        return FunctionCall();
+   // if (Match(TokenType.Identifier) && NextIs(TokenType.OpenParen))
+        //return FunctionCall();
 
     if (Match(TokenType.Identifier))
         return new Variable(Advance());
 
-    if (Match(TokenType.OpenParen))
+    /*if (Match(TokenType.OpenParen))
     {
         Advance(); // consume '('
         var expr = Expression();
         Consume(TokenType.CloseParen, "Esperaba ')'");
         return expr;
-    }
+    }*/
 
     throw new ParserException($"Expresión inesperada: {Current.Lexeme}");
 }
 
-    private bool IsAtEnd => position >= lexer.Tokens.Count - 1;
-    private Token Advance() => lexer.Tokens[position++];
+    private bool IsAtEnd => position >= lexer.Tokens.Count;
+         private Token Advance()
+    {
+        // Asegúrate de que no se esté intentando avanzar más allá del final de la lista de tokens
+        if (!IsAtEnd)
+        {
+            return lexer.Tokens[position++]; // Devuelve el token actual y avanza la posición
+        }
+        // Si se intenta avanzar más allá del final, puedes lanzar una excepción o devolver un token nulo
+        throw new ParserException("No hay más tokens para procesar.");
+    }
+
     private Token Current => lexer.Tokens[position];
 
     private bool NextIs(TokenType tipo)

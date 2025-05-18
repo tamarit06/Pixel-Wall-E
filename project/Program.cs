@@ -2,15 +2,22 @@
 {
     static void Main(string[] args)
     {
-        string codigoFuente = "x <- 3 + 5 * 2"; // tu código aquí
+        string codigoFuente = "x"; // tu código aquí
 
         Lexer lexer = new Lexer(codigoFuente);
         lexer.Tokenize();
 
-        Parser parser = new Parser(lexer);
-        List<ASTnode> ast = parser.Parse();
+        // Imprimir la lista de tokens
+        foreach (var token in lexer.Tokens)
+        {
+            Console.WriteLine(token.ToString());
+        }
 
-        foreach (var nodo in ast)
+        var parser = new Parser(lexer);
+        parser.Parsind();
+
+        // Imprimir los nodos
+        foreach (var nodo in parser.Nodos)
         {
             ASTPrinter.Print(nodo);
         }
