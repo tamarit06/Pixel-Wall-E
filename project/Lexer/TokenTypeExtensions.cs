@@ -17,22 +17,22 @@ public class TokenTypeExtensions
             //aritmetic expressions
             { TokenType.Plus, @"^\+" },
             { TokenType.Minus, @"^-" },
+             {TokenType.Pow,@"^\*\*"},
             { TokenType.Multiply, @"^\*" },
             { TokenType.Divide, @"^/" },
-            {TokenType.Pow,@"^\*\*"},
             {TokenType.Modulus, @"^%" },
 
              //boolean expression
             {TokenType.And, @"^&&"},
-            {TokenType.Or, @"^||"},
+             { TokenType.Or, @"^\|\|" }, 
             { TokenType.Equal, @"^==" },
-            { TokenType.Greater, @"^>" },
-            { TokenType.Less, @"^<" },
             { TokenType.GreaterEqual, @"^>=" },
             { TokenType.LessEqual, @"^<=" },
+             { TokenType.Greater, @"^>" },
+            { TokenType.Less, @"^<" },
 
             //Symbols
-            { TokenType.OpenParen, @"^\(" }, 
+             { TokenType.OpenParen, @"^\(" }, 
             { TokenType.CloseParen, @"^\)" },
             { TokenType.OpenBracket, @"^\[" },
             { TokenType.CloseBracket, @"^\]" },

@@ -2,7 +2,7 @@
 {
     static void Main(string[] args)
     {
-        string codigoFuente = "x"; // tu código aquí
+        string codigoFuente = "x <- Prr(\"red\")"; // tu código aquí
 
         Lexer lexer = new Lexer(codigoFuente);
         lexer.Tokenize();

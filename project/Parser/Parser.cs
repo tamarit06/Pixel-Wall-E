@@ -23,7 +23,7 @@ public class Parser
 {
     while (!IsAtEnd)
     {
-        var stmt = Primary(); // Cambia esto si necesitas otro método para parsear
+        var stmt = AssignmentParse(); //Cambia esto si necesitas otro método para parsear
         if (stmt != null)
             Nodos.Add(stmt);
     }
@@ -38,98 +38,98 @@ public class Parser
 }
 
 
-/*private ASTNode ParseStatement()
-{
-    // si es un identificador y luego abre parentesis
-    if (Current.Type == TokenType.Identifier && NextIs(TokenType.OpenParen))
+    /*private ASTNode ParseStatement()
     {
-         return ParseGenericInstruction();
-      
-    }
-
-
- if (Current.Type == TokenType.GoTo)
-    {
-        return ParseGoTo();
-    }
-    // Si es un identificador y no es asignación ni instrucción, puede ser una etiqueta
-    if (Current.Type == TokenType.Identifier && !NextIs(TokenType.AssigmentExpresions))
-    {
-        return LabelParse();
-    }
-
-
-     if (NextIs(TokenType.AssigmentExpresions))
-     {
-        return ParseAssignment();
-     }
-
-}
-
-private ASTNode ParseGenericInstruction()
-{
-    var name = Consume(TokenType.Identifier, "Se esperaba nombre de instrucción").Lexeme;
-
-    Consume(TokenType.OpenParen, "Se esperaba '('");
-
-    List<ASTNode> parameters = new();
-
-    if (Current.Type != TokenType.CloseParen)
-    {
-        do
+        // si es un identificador y luego abre parentesis
+        if (Current.Type == TokenType.Identifier && NextIs(TokenType.OpenParen))
         {
-            parameters.Add(Expression()); // puede ser número, color, variable, función, etc.
-        } while (Match(TokenType.Comma) && Advance() != null);
+             return ParseGenericInstruction();
+
+        }
+
+
+     if (Current.Type == TokenType.GoTo)
+        {
+            return ParseGoTo();
+        }
+        // Si es un identificador y no es asignación ni instrucción, puede ser una etiqueta
+        if (Current.Type == TokenType.Identifier && !NextIs(TokenType.AssigmentExpresions))
+        {
+            return LabelParse();
+        }
+
+
+         if (NextIs(TokenType.AssigmentExpresions))
+         {
+            return ParseAssignment();
+         }
+
     }
 
-    Consume(TokenType.CloseParen, "Se esperaba ')'");
+    private ASTNode ParseGenericInstruction()
+    {
+        var name = Consume(TokenType.Identifier, "Se esperaba nombre de instrucción").Lexeme;
 
-    return new GenericInstructionNode(name, parameters);
-}
+        Consume(TokenType.OpenParen, "Se esperaba '('");
 
-private ASTNode LabelParse()
-{
-    var labelToken = Consume(TokenType.Identifier, "Se esperaba nombre de etiqueta");
-    return new Label(labelToken.Lexeme);
-}
+        List<ASTNode> parameters = new();
 
-private ASTNode ParseGoTo()//ver esto
-{
-    Consume(TokenType.GoTo, "Se esperaba 'GoTo'");
+        if (Current.Type != TokenType.CloseParen)
+        {
+            do
+            {
+                parameters.Add(Expression()); // puede ser número, color, variable, función, etc.
+            } while (Match(TokenType.Comma) && Advance() != null);
+        }
 
-    Consume(TokenType.OpenBracket, "Se esperaba '['");
-    var labelName = Consume(TokenType.Identifier, "Se esperaba el nombre de una etiqueta").Lexeme;
-    Consume(TokenType.CloseBracket, "Se esperaba ']'");
+        Consume(TokenType.CloseParen, "Se esperaba ')'");
 
-    Consume(TokenType.OpenParen, "Se esperaba '('");
+        return new GenericInstructionNode(name, parameters);
+    }
 
-    var condition = BooleanExpression();
+    private ASTNode LabelParse()
+    {
+        var labelToken = Consume(TokenType.Identifier, "Se esperaba nombre de etiqueta");
+        return new Label(labelToken.Lexeme);
+    }
 
-    Consume(TokenType.CloseParen, "Se esperaba ')'");
+    private ASTNode ParseGoTo()//ver esto
+    {
+        Consume(TokenType.GoTo, "Se esperaba 'GoTo'");
 
-    return new Goto(labelName, condition);
-}
+        Consume(TokenType.OpenBracket, "Se esperaba '['");
+        var labelName = Consume(TokenType.Identifier, "Se esperaba el nombre de una etiqueta").Lexeme;
+        Consume(TokenType.CloseBracket, "Se esperaba ']'");
+
+        Consume(TokenType.OpenParen, "Se esperaba '('");
+
+        var condition = BooleanExpression();
+
+        Consume(TokenType.CloseParen, "Se esperaba ')'");
+
+        return new Goto(labelName, condition);
+    }*/
 
 
-private ASTNode ParseAssignment()
+private ASTNode AssignmentParse()
 {
     var variable = Consume(TokenType.Identifier, "Se esperaba un nombre de variable");
 
     Consume(TokenType.AssigmentExpresions, "Se esperaba '<-' para la asignación");
 
-    var expression = Expression();
+        var expression = Or();
 
     return new Assignment(variable.Lexeme, expression);
 }
 
 // 1. Máximo nivel (lógico OR)
-private ASTNode Expression()
+private ASTNode Or()
 {
-    var left = And();
+    ASTNode left = And();
     while (Match(TokenType.Or))
     {
         var op = Advance();
-        var right = And();
+        ASTNode right = And();
         left = new BinaryExpression(left, op, right);
     }
     return left;
@@ -138,61 +138,73 @@ private ASTNode Expression()
 // 2. Operador lógico AND
 private ASTNode And()
 {
-    var left = Comparison();
+     ASTNode left = Equality();
     while (Match(TokenType.And))
     {
         var op = Advance();
-        var right = Comparison();
+        ASTNode right = Equality();
         left= new BinaryExpression(left, op, right);
     }
     return left;
 }
-
-// 3. Comparaciones (==, <, >, etc.)
-private ASTNode Comparison()
-{
-    var left = Term();
-    while (Match(TokenType.Equal, TokenType.Greater, TokenType.Less, 
-                 TokenType.GreaterEqual, TokenType.LessEqual))
+ 
+ //3. Igualdad(==)
+ private ASTNode Equality()
     {
-        var op = Advance();
-        var right = Term();
-        left = new BinaryExpression(left, op, right);
+        ASTNode left = Comparison();
+        while (Match(TokenType.Equal))
+        {
+            Token op = Advance();
+            ASTNode right = Comparison();
+            left = new BinaryExpression(left, op, right);
+        }
+        return left;
     }
-    return left;
-}
+    // 4. Comparaciones (<, >, <=,>=)
+    private ASTNode Comparison()
+    {
+        ASTNode left = Term();
+        while (Match( TokenType.Greater, TokenType.Less,
+                     TokenType.GreaterEqual, TokenType.LessEqual))
+        {
+            var op = Advance();
+            ASTNode right = Term();
+            left = new BinaryExpression(left, op, right);
+        }
+        return left;
+    }
 
-// 4. Suma y resta
+// 5. Suma y resta
 private ASTNode Term()
 {
     ASTNode left = Factor();
     while (Match(TokenType.Plus, TokenType.Minus))
     {
-        var op = Advance();
-        var right = Factor();
+        Token op = Advance();
+        ASTNode right = Factor();
         left = new BinaryExpression(left, op, right);
     }
     return left;
 }
 
-// 5. Multiplicación, división y módulo
+// 6. Multiplicación, división y módulo
 private ASTNode Factor()
 {
-    ASTNode left = Unary();
+    ASTNode left = Pow();
     while (Match(TokenType.Multiply, TokenType.Divide, TokenType.Modulus))
     {
         var op = Advance();
-        var right = Unary();
+        var right = Pow();
         left = new BinaryExpression(left, op, right);
     }
     return left;
 }
 
-//6 Potencia
+//7 Potencia
 private ASTNode Pow()
 {
     ASTNode left= Unary();
-    if (Match(TokenType.Pow))
+    if(Match(TokenType.Pow))
     {
         Token op=Advance();
         ASTNode right=Pow();
@@ -201,7 +213,7 @@ private ASTNode Pow()
     return left;
 }
 
-// 7. Unarios
+// 8. Unarios
 private ASTNode Unary()
 {
     if (Match(TokenType.Minus))
@@ -213,7 +225,7 @@ private ASTNode Unary()
     return Primary();
 }
 
-//8 Funciones
+//9 Funciones
 private ASTNode FunctionCall()
 {
     var name = Consume(TokenType.Identifier, "Se esperaba nombre de función").Lexeme;
@@ -222,21 +234,21 @@ private ASTNode FunctionCall()
 
     List<ASTNode> args = new();
 
-    if (Current.Type != TokenType.CloseParen)
+    if (Peek().Type != TokenType.CloseParen)
     {
         do
         {
-            args.Add(Expression());
+            args.Add(Or());
         } while (Match(TokenType.Comma) && Advance() != null);
     }
 
     Consume(TokenType.CloseParen, "Se esperaba ')'");
 
     return new FunctionCallNode(name, args);
-}*/
+}
 
 
-// 9. Literales, variables, paréntesis
+// 10. Literales, variables, paréntesis
 private ASTNode Primary()
 {
     if (Match(TokenType.Number))
@@ -245,57 +257,82 @@ private ASTNode Primary()
     if (Match(TokenType.Color))
         return new ColorNode(Advance());
 
-   // if (Match(TokenType.Identifier) && NextIs(TokenType.OpenParen))
-        //return FunctionCall();
+   if (Match(TokenType.Identifier) && NextIs(TokenType.OpenParen))
+        return FunctionCall();
 
     if (Match(TokenType.Identifier))
         return new Variable(Advance());
 
-    /*if (Match(TokenType.OpenParen))
+    if (Match(TokenType.OpenParen))
     {
         Advance(); // consume '('
-        var expr = Expression();
+        var expr = Or();//cambiar
         Consume(TokenType.CloseParen, "Esperaba ')'");
         return expr;
-    }*/
+    }
 
-    throw new ParserException($"Expresión inesperada: {Current.Lexeme}");
+    throw new ParserException($"Expresión inesperada: {Peek().Lexeme}");
 }
 
     private bool IsAtEnd => position >= lexer.Tokens.Count;
-         private Token Advance()
+
+    private Token Peek()
     {
-        // Asegúrate de que no se esté intentando avanzar más allá del final de la lista de tokens
+        if (IsAtEnd)
+            throw new ParserException("No hay más tokens para procesar.");
+        return lexer.Tokens[position]; // Devuelve el token actual sin avanzar
+    }
+
+    private Token Previous()
+    {
+        if (position == 0)
+            throw new ParserException("No hay token anterior.");
+        return lexer.Tokens[position - 1]; // Devuelve el token anterior
+    }
+
+     private bool Check(TokenType type)
+    {
+        if (IsAtEnd) return false; // Si no hay más tokens, devuelve false
+        return Peek().Type == type; // Compara el tipo del token actual con el tipo esperado
+    }
+    private bool NextIs(TokenType type)
+    {
+        if (position + 1 >= lexer.Tokens.Count) return false; // Verifica si hay un siguiente token
+        return lexer.Tokens[position + 1].Type == type; // Compara el tipo del siguiente token con el tipo esperado
+    }
+
+    private Token Advance()
+    {
         if (!IsAtEnd)
         {
             return lexer.Tokens[position++]; // Devuelve el token actual y avanza la posición
         }
-        // Si se intenta avanzar más allá del final, puedes lanzar una excepción o devolver un token nulo
         throw new ParserException("No hay más tokens para procesar.");
     }
 
-    private Token Current => lexer.Tokens[position];
 
-    private bool NextIs(TokenType tipo)
-{
-    return position + 1 < lexer.Tokens.Count && lexer.Tokens[position + 1].Type == tipo;
-}
-
-
-     private bool Match(params TokenType[] tokenTypes)
+    private bool Match(params TokenType[] tokenTypes)
     {
         foreach (TokenType type in tokenTypes)
         {
-            if (type == Current.Type) return true;
+            if (Check(type)) // Usa Check para verificar el tipo
+                return true;
         }
         return false;
     }
 
-  private Token Consume(TokenType type, string message)
+ private Token Consume(TokenType type, string message)
+{
+    if (Check(type)) // Cambia Current por Check
     {
-        if (Current.Type== type) return Advance();
-        throw new ParserException(message + $" (en token '{Current.Lexeme}')");
-    }   
+        return Advance(); // Consume el token y avanza
+    }
+    
+    // Solo llama a Previous si hay un token anterior
+    string previousLexeme = position > 0 ? Previous().Lexeme : "N/A";
+    throw new ParserException($"{message} (en token '{previousLexeme}')");
+}
+
 
 
 }
