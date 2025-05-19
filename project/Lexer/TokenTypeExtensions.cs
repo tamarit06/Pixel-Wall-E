@@ -8,11 +8,12 @@ public class TokenTypeExtensions
     {
          TokenGeneral = new()
         {
-            {TokenType.Number, @"^\b\d+\b" },
+            {TokenType.GoTo, @"^GoTo"},
+            { TokenType.Number, @"^\b\d+\b" },
             {TokenType.Identifier,@"^[a-zA-ZñÑáéíóúÁÉÍÓÚ][a-zA-ZñÑáéíóúÁÉÍÓÚ0-9_-]*" },
             {TokenType.Color,"^\"[^\"]*\""},
             {TokenType.AssigmentExpresions, @"^\<-"  },
-            {TokenType.GoTo, @"^GoTo"},
+            
 
             //aritmetic expressions
             { TokenType.Plus, @"^\+" },
@@ -42,8 +43,8 @@ public class TokenTypeExtensions
         };
 
     }
-   
-    
+
+
     public enum TokenType
     {
         Identifier,
@@ -51,17 +52,22 @@ public class TokenTypeExtensions
         Color,
         AssigmentExpresions,
         GoTo,
-        
+
         //aritmetic expressions
-         Plus, Minus, Multiply, Divide,Pow, Modulus,
-         //boolean expression
+        Plus, Minus, Multiply, Divide, Pow, Modulus,
+        //boolean expression
         And, Or, Equal, Less, LessEqual, Greater, GreaterEqual,
-         //Symbols
+        //Symbols
         OpenBracket, CloseBracket, OpenParen, CloseParen, Comma,
 
+        EOL,
+        EOF,
+        
         Istructions,
         Functions,
         Desconocido,
+        
+
     }
   
   

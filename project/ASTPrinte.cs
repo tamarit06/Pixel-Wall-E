@@ -40,6 +40,29 @@ public static class ASTPrinter
                 Print(f.Arguments[i], indent + (isLast ? "    " : "│   "), lastArg);
             }
         }
+         else if (node is GoTo g) // Manejo de nodos de GoTo
+        {
+            Console.WriteLine($"{indent}└── GoTo: {g.Label}");
+            if (g.Condition != null)
+            {
+                Console.WriteLine($"{indent}    └── Condition:");
+                Print(g.Condition, indent + (isLast ? "    " : "│   "), true);
+            }
+        }
+        else if (node is Label l) // Manejo de nodos de Label
+        {
+            Console.WriteLine($"{indent}└── Label: {l.Value}");
+        }
+
+         else if (node is GenericInstructionNode instr) // Nueva sección para instrucciones
+        {
+            Console.WriteLine($"{indent}└── Instruction: {instr.InstructionName}");
+            for (int i = 0; i < instr.Parameters.Count; i++)
+            {
+                bool lastParam = (i == instr.Parameters.Count - 1);
+                Print(instr.Parameters[i], indent + (isLast ? "    " : "│   "), lastParam);
+            }
+        }
         else
         {
             Console.WriteLine($"{indent}└── Tipo de nodo desconocido");
