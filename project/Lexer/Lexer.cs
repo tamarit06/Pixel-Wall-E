@@ -8,14 +8,14 @@ public class Lexer
 {
     private readonly string Input;
     private int Position;
-    private int Linea;
+    private int Line;
     public List<Token> Tokens { get; set; }
 
     public Lexer(string input)
     {
         Input = input;
         Position = 0;
-        Linea = 1;
+        Line = 1;
         Tokens = new List<Token>();
     }
 
@@ -27,7 +27,7 @@ public class Lexer
             {
                 if (Input[Position] == '\n')
                 {
-                    Linea++;
+                    Line++;
                     AddToken(TokenType.EOL,"\\n");
                 }
                 Position++;
@@ -64,6 +64,6 @@ public class Lexer
 
     private void AddToken(TokenType type, string lexeme)
     {
-        Tokens.Add(new Token(type, lexeme, Linea, Position));
+        Tokens.Add(new Token(type, lexeme, Line, Position));
     }
 }

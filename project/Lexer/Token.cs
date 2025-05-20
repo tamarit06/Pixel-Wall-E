@@ -8,16 +8,16 @@ public class Token
 {
     public TokenType Type { get; }
     public string Lexeme { get; }
-    public int Linea { get; }
-    public int Posicion { get; }
+    public int Line { get; }
+    public int Position { get; }
 
-    public Token(TokenType type, string lexeme, int linea, int posicion)
+    public Token(TokenType type, string lexeme, int line, int position)
     {
         Type = type;
         Lexeme = lexeme;
-        Linea = linea;
-        Posicion = posicion;
+        Line = line;
+        Position = position;
     }
 
-    public override string ToString() => $"[{Type}: '{Lexeme}' en línea {Linea}, posición {Posicion}]";
+    public override string ToString() => $"[{Type}: '{Lexeme}' en línea {Line}, posición {Position}]";
 }
