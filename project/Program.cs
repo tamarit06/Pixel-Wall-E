@@ -4,7 +4,7 @@
     {
         string codigoFuente =
         @"Spawn(0, 0)
-        {}"; 
+        x<3+2"; 
 
         Lexer lexer = new Lexer(codigoFuente);
         lexer.Tokenize();

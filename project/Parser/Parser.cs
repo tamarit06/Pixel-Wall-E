@@ -124,7 +124,7 @@ public class Parser
 
         Consume(TokenType.CloseParen, "Se esperaba ')'");
         ConsumeEOL();
-        return new GenericInstructionNode(name, parameters);
+        return new InstructionNode(name, parameters);
     }
 
     private ASTNode ParseGoTo()//ver esto
@@ -187,7 +187,7 @@ public class Parser
         {
             var op = Advance();
             ASTNode right = And();
-            left = new BinaryExpression(left, op, right);
+            left = new BinaryBoolean(left, op, right);
         }
         return left;
     }
@@ -200,7 +200,7 @@ public class Parser
         {
             var op = Advance();
             ASTNode right = Equality();
-            left = new BinaryExpression(left, op, right);
+            left = new BinaryBoolean(left, op, right);
         }
         return left;
     }
@@ -213,7 +213,7 @@ public class Parser
         {
             Token op = Advance();
             ASTNode right = Comparison();
-            left = new BinaryExpression(left, op, right);
+            left = new BinaryBoolean(left, op, right);
         }
         return left;
     }
@@ -226,7 +226,7 @@ public class Parser
         {
             var op = Advance();
             ASTNode right = Term();
-            left = new BinaryExpression(left, op, right);
+            left = new BinaryBoolean(left, op, right);
         }
         return left;
     }
@@ -239,7 +239,7 @@ public class Parser
         {
             Token op = Advance();
             ASTNode right = Factor();
-            left = new BinaryExpression(left, op, right);
+            left = new BinaryAritmethic(left, op, right);
         }
         return left;
     }
@@ -252,7 +252,7 @@ public class Parser
         {
             var op = Advance();
             var right = Pow();
-            left = new BinaryExpression(left, op, right);
+            left = new BinaryAritmethic(left, op, right);
         }
         return left;
     }
@@ -265,7 +265,7 @@ public class Parser
         {
             Token op = Advance();
             ASTNode right = Pow();
-            left = new BinaryExpression(left, op, right);
+            left = new BinaryAritmethic(left, op, right);
         }
         return left;
     }
@@ -311,8 +311,8 @@ public class Parser
         if (Match(TokenType.Number))
             return new Number(Advance());
 
-        if (Match(TokenType.Color))
-            return new ColorNode(Advance());
+        if (Match(TokenType.String_))
+            return new StringNode(Advance());
 
         if (Match(TokenType.Identifier) && NextIs(TokenType.OpenParen))
             return FunctionCall();
@@ -325,7 +325,7 @@ public class Parser
             Advance(); // consume '('
             var expr = Or();//cambiar
             Consume(TokenType.CloseParen, "Esperaba ')'");
-            return expr;
+            return new GroupingExpr(expr);
         }
 
         throw new ParserException($"Expresión inesperada: {Peek().Lexeme}", Peek().Line, Peek().Position);

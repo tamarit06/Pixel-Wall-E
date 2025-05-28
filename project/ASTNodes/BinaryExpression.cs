@@ -1,4 +1,4 @@
-public class BinaryExpression: ASTNode
+public abstract class BinaryExpression: ASTNode
 {
     public ASTNode Left{get;}
     public Token Op{get;}

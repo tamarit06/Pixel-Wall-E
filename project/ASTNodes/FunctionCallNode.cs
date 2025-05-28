@@ -8,4 +8,8 @@ public class FunctionCallNode : ASTNode
         FunctionName = name;
         Arguments = arguments;
     }
+     public override T Accept<T>(IVisitor<T> visitor)
+    {
+        return visitor.Visit(this);
+    }
 }

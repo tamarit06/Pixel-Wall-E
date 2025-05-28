@@ -8,4 +8,9 @@ public class Number : ASTNode
         Num = num;
         Value = double.Parse(num.Lexeme);
     }
+
+     public override T Accept<T>(IVisitor<T> visitor)
+    {
+        return visitor.Visit(this);
+    }
 }

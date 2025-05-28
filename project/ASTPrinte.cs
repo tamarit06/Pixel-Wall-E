@@ -6,9 +6,9 @@ public static class ASTPrinter
         {
             Console.WriteLine($"{indent}└── Number: {n.Value}");
         }
-        else if (node is ColorNode c)
+        else if (node is StringNode c)
         {
-            Console.WriteLine($"{indent}└── Color: {c.Value}");
+            Console.WriteLine($"{indent}└── String: {c.Value}");
         }
         else if (node is Variable v)
         {
@@ -54,7 +54,7 @@ public static class ASTPrinter
             Console.WriteLine($"{indent}└── Label: {l.Value}");
         }
 
-         else if (node is GenericInstructionNode instr) // Nueva sección para instrucciones
+         else if (node is InstructionNode instr) // Nueva sección para instrucciones
         {
             Console.WriteLine($"{indent}└── Instruction: {instr.InstructionName}");
             for (int i = 0; i < instr.Parameters.Count; i++)

@@ -11,11 +11,11 @@ public class TokenTypeExtensions
             {TokenType.GoTo, @"^GoTo"},
             { TokenType.Number, @"^\b\d+\b" },
             {TokenType.Identifier,@"^[a-zA-ZñÑáéíóúÁÉÍÓÚ][a-zA-ZñÑáéíóúÁÉÍÓÚ0-9_-]*" },
-            {TokenType.Color,"^\"[^\"]*\""},
+            {TokenType.String_,"^\"[^\"]*\""},
             {TokenType.AssigmentExpresions, @"^\<-"  },
             
 
-            //aritmetic expressions
+            //aritmetic expressi_ons
             { TokenType.Plus, @"^\+" },
             { TokenType.Minus, @"^-" },
              {TokenType.Pow,@"^\*\*"},
@@ -49,7 +49,7 @@ public class TokenTypeExtensions
     {
         Identifier,
         Number,
-        Color,
+        String_,
         AssigmentExpresions,
         GoTo,
 

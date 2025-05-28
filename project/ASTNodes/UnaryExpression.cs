@@ -1,11 +1,16 @@
-public class UnaryExpression:ASTNode
+public class UnaryExpression : ASTNode
 {
-    public Token Operator{get;}
-    public ASTNode Right{get;}
+    public Token Operator { get; }
+    public ASTNode Right { get; }
 
-    public UnaryExpression(Token op, ASTNode right )
+    public UnaryExpression(Token op, ASTNode right)
     {
-        Operator=op;
-        Right=right;
+        Operator = op;
+        Right = right;
+    }
+    
+     public override T Accept<T>(IVisitor<T> visitor)
+    {
+        return visitor.Visit(this);
     }
 }

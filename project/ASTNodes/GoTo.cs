@@ -8,4 +8,8 @@ public class GoTo : ASTNode
         Label = label;
         Condition = condition;
     }
+     public override T Accept<T>(IVisitor<T> visitor)
+    {
+        return visitor.Visit(this);
+    }
 }
