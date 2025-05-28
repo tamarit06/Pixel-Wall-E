@@ -9,7 +9,7 @@ public interface IVisitor<T>
    T Visit(FunctionCallNode functionCallNode);
     T Visit(GoTo goTo);
     T Visit(GroupingExpr groupingExpr);
-    T Visit(InstructionNode instructionNode);
+   T Visit(InstructionNode instructionNode);
     T Visit(Label label);
     T Visit(StringNode stringNode);
     T Visit(UnaryExpression unaryExpression);
