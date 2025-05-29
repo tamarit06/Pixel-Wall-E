@@ -31,24 +31,50 @@ public object Visit(GoTo node)
             break;
 
         case "Color":
-            ExpectTypes(args, typeof(string));
-            state.BrushColor = (string)args[0];
-            break;
+        ExpectTypes(args, typeof(string));
+        var color = (string)args[0];
+
+        if (!TokenTypeExtensions.ColorValue.Contains(color))
+            throw new Exception($"Color no válido: '{color}'");
+
+        state.BrushColor = color;
+        break;
+
 
         case "Size":
             ExpectTypes(args, typeof(double));
-            state.BrushSize = Convert.ToInt32(args[0]);
+            int size = Convert.ToInt32(args[0]);
+            if (size % 2 == 0 || size < 1)
+            throw new Exception("El tamaño de la brocha debe ser un número impar mayor o igual que 1.");
+            state.BrushSize = size;
             break;
 
         case "DrawLine":
-            ExpectTypes(args, typeof(double), typeof(double), typeof(double), typeof(double));
-            state.DrawLine(
-                Convert.ToInt32(args[0]),
-                Convert.ToInt32(args[1]),
-                Convert.ToInt32(args[2]),
-                Convert.ToInt32(args[3])
-            );
+            ExpectTypes(args, typeof(double), typeof(double), typeof(double));
+            int dx = Convert.ToInt32(args[0]);
+            int dy = Convert.ToInt32(args[1]);
+            int length = Convert.ToInt32(args[2]);
+            if (Math.Abs(dx) > 1 || Math.Abs(dy) > 1)
+            throw new Exception("Dirección inválida. dx y dy deben ser -1, 0 o 1.");
+            state.DrawLine(dx, dy, length);
             break;
+        case "DrawRectangle":
+        ExpectTypes(args, typeof(double), typeof(double), typeof(double), typeof(double),typeof(double));
+        int dirx = Convert.ToInt32(args[0]);
+        int diry = Convert.ToInt32(args[1]);
+        int dist = Convert.ToInt32(args[2]);
+        int w = Convert.ToInt32(args[3]);
+        int h = Convert.ToInt32(args[4]);
+        state.DrawRectangle(dirx,diry,dist,w, h);
+        break;
+
+        case "DrawCircle":
+        ExpectTypes(args, typeof(double),  typeof(double), typeof(double));
+        int dix=Convert.ToInt32(args[0]);
+        int diy=Convert.ToInt32(args[0]);
+        int r = Convert.ToInt32(args[0]);
+        state.DrawCircle(dix, diy,r);
+        break;
 
         case "Fill":
             ExpectTypes(args); // no se espera ningún argumento
@@ -179,5 +205,4 @@ public object Visit(GoTo node)
     }
       
     public IReadOnlyDictionary<string, object> Memory => memory;
-
 }

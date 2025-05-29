@@ -3,10 +3,14 @@ using System.Collections;
 public class TokenTypeExtensions
 {
     public static readonly Dictionary<TokenType, string> TokenGeneral;
-    
+    public static readonly HashSet<string> ColorValue = new HashSet<string>
+{
+    "Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Black", "White", "Transparent"
+};
+
     static TokenTypeExtensions()
     {
-         TokenGeneral = new()
+        TokenGeneral = new()
         {
             {TokenType.GoTo, @"^GoTo"},
             { TokenType.Number, @"^\b\d+\b" },
@@ -25,7 +29,7 @@ public class TokenTypeExtensions
 
              //boolean expression
             {TokenType.And, @"^&&"},
-             { TokenType.Or, @"^\|\|" }, 
+             { TokenType.Or, @"^\|\|" },
             { TokenType.Equal, @"^==" },
             { TokenType.GreaterEqual, @"^>=" },
             { TokenType.LessEqual, @"^<=" },
@@ -33,13 +37,13 @@ public class TokenTypeExtensions
             { TokenType.Less, @"^<" },
 
             //Symbols
-             { TokenType.OpenParen, @"^\(" }, 
+             { TokenType.OpenParen, @"^\(" },
             { TokenType.CloseParen, @"^\)" },
             { TokenType.OpenBracket, @"^\[" },
             { TokenType.CloseBracket, @"^\]" },
             { TokenType.Comma, @"^," },
 
-        
+
         };
 
     }
@@ -62,13 +66,11 @@ public class TokenTypeExtensions
 
         EOL,
         EOF,
-        
+
         Istructions,
         Functions,
         Desconocido,
-        
+
 
     }
-  
-  
 }
