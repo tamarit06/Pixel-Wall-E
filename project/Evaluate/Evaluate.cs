@@ -37,25 +37,43 @@ public object Visit(Label node)
     }
 
     public object Visit(BinaryBoolean binaryBoolean)
+{
+    var left = evaluate(binaryBoolean.Left);
+    var right = evaluate(binaryBoolean.Right);
+
+    // Lógica para operadores lógicos
+    if (binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And ||
+        binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.Or)
     {
-        var left = evaluate(binaryBoolean.Left);
-        var right = evaluate(binaryBoolean.Right);
-
-        if (left is double l && right is double r)
+        if (left is bool l && right is bool r)
         {
-            return binaryBoolean.Op.Type switch
-            {
-                TokenTypeExtensions.TokenType.Equal => l == r,
-                TokenTypeExtensions.TokenType.Less => l < r,
-                TokenTypeExtensions.TokenType.LessEqual => l <= r,
-                TokenTypeExtensions.TokenType.Greater => l > r,
-                TokenTypeExtensions.TokenType.GreaterEqual => l >= r,
-                _ => throw new Exception("Operador booleano inválido")
-            };
+            return binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And
+                ? l && r
+                : l || r;
         }
-
-        throw new Exception("Operandos no numéricos en operación booleana");
+        else
+        {
+            throw new Exception("Operandos de '&&' o '||' deben ser booleanos.");
+        }
     }
+
+    // Lógica para operadores relacionales numéricos
+    if (left is double lNum && right is double rNum)
+    {
+        return binaryBoolean.Op.Type switch
+        {
+            TokenTypeExtensions.TokenType.Equal        => lNum == rNum,
+            TokenTypeExtensions.TokenType.Greater      => lNum > rNum,
+            TokenTypeExtensions.TokenType.Less         => lNum < rNum,
+            TokenTypeExtensions.TokenType.GreaterEqual => lNum >= rNum,
+            TokenTypeExtensions.TokenType.LessEqual    => lNum <= rNum,
+            _ => throw new Exception("Operador booleano inválido.")
+        };
+    }
+
+    throw new Exception("Operandos incompatibles en operación booleana.");
+}
+
     public object Visit(BinaryAritmethic binaryAritmethic)
     {
         var left = evaluate(binaryAritmethic.Left);

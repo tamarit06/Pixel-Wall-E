@@ -3,7 +3,7 @@
     static void Main(string[] args)
     {
         string codigoFuente = @" Spawn(0, 0)
-            x <- 4/-2";
+            x <- 3+3==4 || 4>3";
 
         Lexer lexer = new Lexer(codigoFuente);
         lexer.Tokenize();
