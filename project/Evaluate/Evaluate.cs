@@ -1,5 +1,6 @@
 public class Evaluate : IVisitor<object>
 {
+    private WallEState state = new WallEState();
     private Dictionary<string, object> memory = new();
 
     public object Visit(FunctionCallNode node)
@@ -12,15 +13,56 @@ public object Visit(GoTo node)
     throw new Exception("No se puede evaluar un 'GoTo' en modo calculadora.");
 }
 
-public object Visit(InstructionNode node)
+    public object Visit(Label node)
+    {
+        throw new Exception("No se puede evaluar una etiqueta.");
+    }
+
+    public object Visit(InstructionNode node)
 {
-    throw new Exception("No se puede evaluar una instrucción como expresión.");
+    var args = node.Parameters.Select(e => evaluate(e)).ToList();
+
+    switch (node.InstructionName)
+    {
+        case "Spawn":
+            ExpectTypes(args, typeof(double), typeof(double));
+            state.X = Convert.ToInt32(args[0]);
+            state.Y = Convert.ToInt32(args[1]);
+            break;
+
+        case "Color":
+            ExpectTypes(args, typeof(string));
+            state.BrushColor = (string)args[0];
+            break;
+
+        case "Size":
+            ExpectTypes(args, typeof(double));
+            state.BrushSize = Convert.ToInt32(args[0]);
+            break;
+
+        case "DrawLine":
+            ExpectTypes(args, typeof(double), typeof(double), typeof(double), typeof(double));
+            state.DrawLine(
+                Convert.ToInt32(args[0]),
+                Convert.ToInt32(args[1]),
+                Convert.ToInt32(args[2]),
+                Convert.ToInt32(args[3])
+            );
+            break;
+
+        case "Fill":
+            ExpectTypes(args); // no se espera ningún argumento
+            state.FillFrom(state.X, state.Y, state.Canvas[state.X, state.Y]);
+            break;
+
+        default:
+            throw new Exception($"Instrucción desconocida: {node.InstructionName}");
+    }
+
+    return null;
 }
 
-public object Visit(Label node)
-{
-    throw new Exception("No se puede evaluar una etiqueta.");
-}
+
 
     public object Visit(Variable variable)
     {
@@ -124,6 +166,18 @@ public object Visit(Label node)
         return expr.Accept(this);
     } 
 
+    private void ExpectTypes(List<object> args, params Type[] expected)
+    {
+        if (args.Count != expected.Length)
+            throw new Exception($"Se esperaban {expected.Length} argumentos.");
+
+        for (int i = 0; i < expected.Length; i++)
+        {
+            if (args[i] == null || args[i].GetType() != expected[i])
+                throw new Exception($"El argumento {i + 1} debe ser de tipo {expected[i].Name}");
+        }
+    }
+      
     public IReadOnlyDictionary<string, object> Memory => memory;
 
 }
