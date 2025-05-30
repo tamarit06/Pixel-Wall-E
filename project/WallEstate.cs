@@ -13,7 +13,7 @@ public class WallEState
         Canvas = new string[CanvasSize, CanvasSize];
         for (int i = 0; i < CanvasSize; i++)
             for (int j = 0; j < CanvasSize; j++)
-                Canvas[i, j] = "White";
+                Canvas[i, j] = "\"White\"";//ver esto
     }
 
     public void SetPixel(int x, int y)

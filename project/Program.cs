@@ -1,9 +1,12 @@
-﻿class Program
+﻿using System.Data;
+
+class Program
 {
     static void Main(string[] args)
     {
-        string codigoFuente = @" Spawn(0, 0)
-            x <- 3+3==4 || 4>3";
+        string codigoFuente =
+        @"Spawn(3, 4)
+x<- GetColorCount (""White"",0, 0 ,2, 2)";
 
         Lexer lexer = new Lexer(codigoFuente);
         lexer.Tokenize();
@@ -13,28 +16,26 @@
 
         var evaluator = new Evaluate();
 
-        foreach (var nodo in parser.Nodos)
-        {
-            Console.WriteLine(">>> AST:");
-            ASTPrinter.Print(nodo);
+       foreach (var nodo in parser.Nodos)
+{
+    Console.WriteLine(">>> AST:");
+    ASTPrinter.Print(nodo);
 
-            if (nodo is Assignment || nodo is BinaryExpression || nodo is UnaryExpression || nodo is Variable || nodo is Number || nodo is GroupingExpr)
-            {
-                try
-                {
-                    var result = evaluator.evaluate(nodo);
-                    Console.WriteLine($">>> Resultado: {result}\n");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($">>> Error en evaluación: {e.Message}\n");
-                }
-            }
-            else
-            {
-                Console.WriteLine(">>> Nodo no evaluado (no es una expresión).\n");
-            }
-        }
+    try
+    {
+        var result = evaluator.evaluate(nodo);
+
+        // Si es expresión, muestra resultado
+        if (nodo is Assignment || nodo is BinaryExpression || nodo is UnaryExpression || nodo is Variable || nodo is Number || nodo is GroupingExpr || nodo is FunctionCallNode)
+            Console.WriteLine($">>> Resultado: {result}\n");
+        else
+            Console.WriteLine(">>> Instrucción ejecutada.\n");
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($">>> Error en evaluación: {e.Message}\n");
+    }
+}
 
         Console.WriteLine(">>> Variables almacenadas:");
         foreach (var kvp in evaluator.Memory)
