@@ -26,10 +26,8 @@ public class Evaluate : IVisitor<object>
             }
             else
             {
-                evaluate(nodo);
+                i++;
             }
-
-            i++;
         }
     }
 
@@ -143,55 +141,46 @@ public class Evaluate : IVisitor<object>
         if (binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And ||
             binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.Or)
         {
-            if (left is bool l && right is bool r)
-            {
-                return binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And
-                    ? l && r
-                    : l || r;
-            }
-            else
-            {
-                throw new Exception("Operandos de '&&' o '||' deben ser booleanos.");
-            }
+
+            return binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And
+                ? (bool)left && (bool)right
+                : (bool)left || (bool)right;
         }
 
         // Lógica para operadores relacionales numéricos
-        if (left is int lNum && right is int rNum)
-        {
+        int lNum = Convert.ToInt32(left);
+        int rNum = Convert.ToInt32(right);
             return binaryBoolean.Op.Type switch
-            {
-                TokenTypeExtensions.TokenType.Equal => lNum == rNum,
-                TokenTypeExtensions.TokenType.Greater => lNum > rNum,
-                TokenTypeExtensions.TokenType.Less => lNum < rNum,
-                TokenTypeExtensions.TokenType.GreaterEqual => lNum >= rNum,
-                TokenTypeExtensions.TokenType.LessEqual => lNum <= rNum,
-                _ => throw new Exception("Operador booleano inválido.")
-            };
-        }
-
-        throw new Exception("Operandos incompatibles en operación booleana.");
+        {
+            TokenTypeExtensions.TokenType.Equal => lNum == rNum,
+            TokenTypeExtensions.TokenType.Greater => lNum > rNum,
+            TokenTypeExtensions.TokenType.Less => lNum < rNum,
+            TokenTypeExtensions.TokenType.GreaterEqual => lNum >= rNum,
+            TokenTypeExtensions.TokenType.LessEqual => lNum <= rNum,
+            _ => throw new Exception("Operador booleano inválido.")
+        };
     }
 
     public object Visit(BinaryAritmethic binaryAritmethic)
     {
-        var left = evaluate(binaryAritmethic.Left);
-        var right = evaluate(binaryAritmethic.Right);
+        object left = evaluate(binaryAritmethic.Left);
+        object right = evaluate(binaryAritmethic.Right);
 
-        if (left is int l && right is int r)
-        {
+        int l = Convert.ToInt32(left);
+        int r = Convert.ToInt32(right);
             return binaryAritmethic.Op.Type switch
-            {
-                TokenTypeExtensions.TokenType.Plus => l + r,
-                TokenTypeExtensions.TokenType.Minus => l - r,
-                TokenTypeExtensions.TokenType.Multiply => l * r,
-                TokenTypeExtensions.TokenType.Divide => l / r,
-                TokenTypeExtensions.TokenType.Pow => Math.Pow(l, r),
-                TokenTypeExtensions.TokenType.Modulus => l % r,
-                _ => throw new Exception("Operador aritmético inválido")
-            };
-        }
+        {
+            TokenTypeExtensions.TokenType.Plus => l + r,
+            TokenTypeExtensions.TokenType.Minus => l - r,
+            TokenTypeExtensions.TokenType.Multiply => l * r,
+            TokenTypeExtensions.TokenType.Divide => l / r,
+            TokenTypeExtensions.TokenType.Pow => Math.Pow(l, r),
+            TokenTypeExtensions.TokenType.Modulus => l % r,
+            _ => throw new Exception("Operador aritmético inválido")
+        };
+      
 
-        throw new Exception("Operandos no numéricos en operación aritmética");
+        throw new Exception("Operandos no numéricos en operación aritmética");//ver lo de los errores
     }
     public object Visit(UnaryExpression unaryExpression)
     {

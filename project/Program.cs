@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Data;
 
 class Program
 {
@@ -6,11 +6,21 @@ class Program
     {
         string codigoFuente =
         @"Spawn(0, 0)
-        i<-0
-        x<-GetActualX()
-        GoTo[aqui](x==0)
-        i<-2
-        aqui";
+ Color(""Black"")
+ n <- 5
+ k <- 3 + 3 * 10
+ n <- k * 2
+ actual_x <- GetActualX()
+ i <- 0
+ loop1
+ DrawLine(1, 0, 1)
+ i <- i + 1
+ is_brush_color_blue <- IsBrushColor(""Blue"")
+ GoTo [loop_ends_here] (is_brush_color_blue == 1)
+ GoTo [loop1] (i < 10)
+ Color(""Blue"")
+ GoTo [loop1] (1 == 1)
+ loop_ends_here";
 
         Lexer lexer = new Lexer(codigoFuente);
         lexer.Tokenize();

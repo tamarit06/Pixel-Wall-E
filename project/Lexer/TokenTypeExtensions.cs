@@ -5,7 +5,7 @@ public class TokenTypeExtensions
     public static readonly Dictionary<TokenType, string> TokenGeneral;
     public static readonly HashSet<string> ColorValue = new HashSet<string>
 {
-    "\"Red\"", "\"Blue\"", "\"Green\"", "\"Yellow\"", "\"Orange\"", "\"Purple\"", "Black", "\"White\"", "\"Transparent\""
+    "\"Red\"", "\"Blue\"", "\"Green\"", "\"Yellow\"", "\"Orange\"", "\"Purple\"", "\"Black\"", "\"White\"", "\"Transparent\""
 };
 
     static TokenTypeExtensions()
