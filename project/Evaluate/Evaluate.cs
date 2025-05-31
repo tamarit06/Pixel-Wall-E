@@ -1,18 +1,51 @@
+public class GoToResult
+{
+    public string Label { get; }
+    public GoToResult(string label) => Label = label;
+}
 public class Evaluate : IVisitor<object>
 {
     private WallEState state = new WallEState();
     private Dictionary<string, object> memory = new();
 
 
+    public void EvaluateProgram(List<ASTNode> nodos)
+    {
+        int i = 0;
+        while (i < nodos.Count)
+        {
+            var nodo = nodos[i];
+             var result = evaluate(nodo);
+            if (result is GoToResult goToResult)
+            {
+               
+                    int newPos = nodos.FindIndex(n => n is Label label && label.Value == goToResult.Label);
+                    i = newPos + 1;
+                    continue;
+                
+            }
+            else
+            {
+                evaluate(nodo);
+            }
+
+            i++;
+        }
+    }
 
     public object Visit(GoTo node)
     {
-        throw new Exception("No se puede evaluar un 'GoTo' en modo calculadora.");
+        var condition = evaluate(node.Condition); // Evalúa la condición
+        if (condition is bool b && b) // Si la condición es verdadera
+        {
+            return new GoToResult(node.Label); // Retorna un GoToResult con la etiqueta
+        }
+        return null; // Si la condición es falsa, no se realiza el salto
     }
 
     public object Visit(Label node)
     {
-        throw new Exception("No se puede evaluar una etiqueta.");
+        return null;
     }
 
     public object Visit(InstructionNode node)
@@ -45,7 +78,7 @@ public class Evaluate : IVisitor<object>
                     throw new Exception("El tamaño de la brocha debe ser un número impar mayor o igual que 1.");
                 state.BrushSize = size;
                 break;
-
+            //hast aqui bien
             case "DrawLine":
                 ExpectTypes(args, typeof(int), typeof(int), typeof(int));
                 int dx = Convert.ToInt32(args[0]);
@@ -211,11 +244,13 @@ public class Evaluate : IVisitor<object>
 
             case "IsBrushColor":
                 ExpectTypes(args, typeof(string));
-                return state.BrushColor == (string)args[0];
+                if (state.BrushColor == (string)args[0]) return 1;
+                return 0;
 
             case "IsBrushSize":
                 ExpectTypes(args, typeof(int));
-                return state.BrushSize == (int)args[0];
+                if (state.BrushSize == (int)args[0]) return 1;
+                return 0;
 
             case "IsCanvasColor":
                 ExpectTypes(args, typeof(string), typeof(int), typeof(int));
@@ -226,7 +261,8 @@ public class Evaluate : IVisitor<object>
                 int x = state.X + h;
                 int y = state.Y + v;
                 if (!EsValido(x, y)) return false;
-                return state.Canvas[x, y] == col;
+                if (state.Canvas[x, y] == col) return 1;
+                return 0;
 
             default:
                 throw new Exception($"Función desconocida: {node.FunctionName}");

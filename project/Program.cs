@@ -1,12 +1,16 @@
-﻿using System.Data;
+﻿using System;
 
 class Program
 {
     static void Main(string[] args)
     {
         string codigoFuente =
-        @"Spawn(3, 4)
-x<- GetColorCount (""White"",0, 0 ,2, 2)";
+        @"Spawn(0, 0)
+        i<-0
+        x<-GetActualX()
+        GoTo[aqui](x==0)
+        i<-2
+        aqui";
 
         Lexer lexer = new Lexer(codigoFuente);
         lexer.Tokenize();
@@ -15,27 +19,7 @@ x<- GetColorCount (""White"",0, 0 ,2, 2)";
         parser.Parsind();
 
         var evaluator = new Evaluate();
-
-       foreach (var nodo in parser.Nodos)
-{
-    Console.WriteLine(">>> AST:");
-    ASTPrinter.Print(nodo);
-
-    try
-    {
-        var result = evaluator.evaluate(nodo);
-
-        // Si es expresión, muestra resultado
-        if (nodo is Assignment || nodo is BinaryExpression || nodo is UnaryExpression || nodo is Variable || nodo is Number || nodo is GroupingExpr || nodo is FunctionCallNode)
-            Console.WriteLine($">>> Resultado: {result}\n");
-        else
-            Console.WriteLine(">>> Instrucción ejecutada.\n");
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine($">>> Error en evaluación: {e.Message}\n");
-    }
-}
+        evaluator.EvaluateProgram(parser.Nodos);
 
         Console.WriteLine(">>> Variables almacenadas:");
         foreach (var kvp in evaluator.Memory)
