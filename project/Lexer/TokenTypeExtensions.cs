@@ -8,6 +8,11 @@ public class TokenTypeExtensions
     "\"Red\"", "\"Blue\"", "\"Green\"", "\"Yellow\"", "\"Orange\"", "\"Purple\"", "\"Black\"", "\"White\"", "\"Transparent\""
 };
 
+ public static readonly HashSet<string> Instructions = new HashSet<string>
+{
+    "Spawn", "Color", "Size", "DrawLine", "DrawCircle", "DrawRectangle", "Fill", 
+};
+
     static TokenTypeExtensions()
     {
         TokenGeneral = new()

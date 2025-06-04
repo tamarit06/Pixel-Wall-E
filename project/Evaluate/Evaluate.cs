@@ -7,105 +7,126 @@ public class Evaluate : IVisitor<object>
 {
     private WallEState state = new WallEState();
     private Dictionary<string, object> memory = new();
+    public List<string> ErroresEvaluacion { get; } = new List<string>();
 
 
-    public void EvaluateProgram(List<ASTNode> nodos)
+
+   public void EvaluateProgram(List<ASTNode> nodos)
+{
+    int i = 0;
+    while (i < nodos.Count)
     {
-        int i = 0;
-        while (i < nodos.Count)
+        try
         {
-            var nodo = nodos[i];
-             var result = evaluate(nodo);
+            var result = evaluate(nodos[i]);
+
             if (result is GoToResult goToResult)
             {
-               
-                    int newPos = nodos.FindIndex(n => n is Label label && label.Value == goToResult.Label);
-                    i = newPos + 1;
+                int newPos = nodos.FindIndex(n => n is Label label && label.Value == goToResult.Label);
+                if (newPos == -1)
+                {
+                    ErroresEvaluacion.Add($"Etiqueta '{goToResult.Label}' no encontrada.");
+                    i++;
                     continue;
-                
-            }
-            else
-            {
-                i++;
+                }
+                i = newPos + 1;
+                continue;
             }
         }
-    }
+        catch (Exception e)
+        {
+            ErroresEvaluacion.Add(e.Message);
+        }
 
-    public object Visit(GoTo node)
+        i++;
+    }
+}
+
+
+    public object? Visit(GoTo node)
     {
         var condition = evaluate(node.Condition); // Evalúa la condición
         if (condition is bool b && b) // Si la condición es verdadera
         {
-            return new GoToResult(node.Label); // Retorna un GoToResult con la etiqueta
+            return new GoToResult(node.LabelName); // Retorna un GoToResult con la etiqueta
         }
         return null; // Si la condición es falsa, no se realiza el salto
     }
 
-    public object Visit(Label node)
+    public object? Visit(Label node)
     {
         return null;
     }
 
-    public object Visit(InstructionNode node)
+    public object? Visit(InstructionNode node)
     {
         var args = node.Parameters.Select(e => evaluate(e)).ToList();
 
         switch (node.InstructionName)
         {
             case "Spawn":
-                ExpectTypes(args, typeof(int), typeof(int));
+                ExpectTypes(node,args, typeof(int), typeof(int));
                 state.X = Convert.ToInt32(args[0]);
                 state.Y = Convert.ToInt32(args[1]);
                 break;
 
             case "Color":
-                ExpectTypes(args, typeof(string));
-                var color = (string)args[0];
+                ExpectTypes(node,args, typeof(string));
+               var color = args[0] as string ?? throw new ErrorException("Se esperaba un string", node.OriginToken.Line, node.OriginToken.Position);
+
 
                 if (!TokenTypeExtensions.ColorValue.Contains(color))
-                    throw new Exception($"Color no válido: '{color}'");
+                    throw new ErrorException($"Color no válido: '{color}'",node.OriginToken.Line,node.OriginToken.Position);
 
                 state.BrushColor = color;
                 break;
 
 
             case "Size":
-                ExpectTypes(args, typeof(int));
+                ExpectTypes(node,args, typeof(int));
                 int size = Convert.ToInt32(args[0]);
                 if (size % 2 == 0 || size < 1)
-                    throw new Exception("El tamaño de la brocha debe ser un número impar mayor o igual que 1.");
+                throw new ErrorException("El tamaño de la brocha debe ser un número impar mayor o igual que 1.",
+                node.OriginToken.Line,node.OriginToken.Position);
                 state.BrushSize = size;
                 break;
             //hast aqui bien
             case "DrawLine":
-                ExpectTypes(args, typeof(int), typeof(int), typeof(int));
+                ExpectTypes(node,args, typeof(int), typeof(int), typeof(int));
                 int dx = Convert.ToInt32(args[0]);
                 int dy = Convert.ToInt32(args[1]);
                 int length = Convert.ToInt32(args[2]);
                 if (Math.Abs(dx) > 1 || Math.Abs(dy) > 1)
-                    throw new Exception("Dirección inválida. dx y dy deben ser -1, 0 o 1.");
+                throw new ErrorException("Dirección inválida. dx y dy deben ser -1, 0 o 1.",
+                node.OriginToken.Line,node.OriginToken.Position);
                 state.DrawLine(dx, dy, length);
                 break;
             case "DrawRectangle":
-                ExpectTypes(args, typeof(int), typeof(int), typeof(int), typeof(int), typeof(int));
+                ExpectTypes(node,args, typeof(int), typeof(int), typeof(int), typeof(int), typeof(int));
                 int dirx = Convert.ToInt32(args[0]);
                 int diry = Convert.ToInt32(args[1]);
                 int dist = Convert.ToInt32(args[2]);
                 int w = Convert.ToInt32(args[3]);
                 int h = Convert.ToInt32(args[4]);
+                if (Math.Abs(dirx) > 1 || Math.Abs(diry) > 1)
+                throw new ErrorException("Dirección inválida. dx y dy deben ser -1, 0 o 1.",
+                node.OriginToken.Line,node.OriginToken.Position);
                 state.DrawRectangle(dirx, diry, dist, w, h);
                 break;
 
             case "DrawCircle":
-                ExpectTypes(args, typeof(int), typeof(int), typeof(double));
+                ExpectTypes(node,args, typeof(int), typeof(int), typeof(double));
                 int dix = Convert.ToInt32(args[0]);
                 int diy = Convert.ToInt32(args[1]);
                 int r = Convert.ToInt32(args[2]);
+                if (Math.Abs(dix) > 1 || Math.Abs(diy) > 1)
+                throw new ErrorException("Dirección inválida. dx y dy deben ser -1, 0 o 1.",
+                node.OriginToken.Line,node.OriginToken.Position);
                 state.DrawCircle(dix, diy, r);
                 break;
 
             case "Fill":
-                ExpectTypes(args); // no se espera ningún argumento
+                ExpectTypes(node,args); // no se espera ningún argumento
                 state.FillFrom(state.X, state.Y, state.Canvas[state.X, state.Y]);
                 break;
 
@@ -121,7 +142,7 @@ public class Evaluate : IVisitor<object>
     public object Visit(Variable variable)
     {
         if (!memory.TryGetValue(variable.Name, out var value))
-            throw new Exception($"Variable '{variable.Name}' no definida");
+            throw new ErrorException($"Variable '{variable.Name}' no definida", variable.OriginToken.Line, variable.OriginToken.Position);
         return value;
     }
 
@@ -132,56 +153,95 @@ public class Evaluate : IVisitor<object>
         return value;
     }
 
-    public object Visit(BinaryBoolean binaryBoolean)
+   public object Visit(BinaryBoolean binaryBoolean)
+{
+    // 1) Evaluar recursivamente ambos operandos
+    object? left  = evaluate(binaryBoolean.Left);
+    object? right = evaluate(binaryBoolean.Right);
+
+    // 2) Si el operador es AND (&&) u OR (||), ambos deben ser bool
+    if (binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And ||
+        binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.Or)
     {
-        var left = evaluate(binaryBoolean.Left);
-        var right = evaluate(binaryBoolean.Right);
-
-        // Lógica para operadores lógicos
-        if (binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And ||
-            binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.Or)
+        if (!(left  is bool) || !(right is bool))
         {
-
-            return binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And
-                ? (bool)left && (bool)right
-                : (bool)left || (bool)right;
+            throw new ErrorException(
+                "Operandos de '&&' o '||' deben ser booleanos.",
+                binaryBoolean.OriginToken.Line,
+                binaryBoolean.OriginToken.Position
+            );
         }
-
-        // Lógica para operadores relacionales numéricos
-        int lNum = Convert.ToInt32(left);
-        int rNum = Convert.ToInt32(right);
-            return binaryBoolean.Op.Type switch
-        {
-            TokenTypeExtensions.TokenType.Equal => lNum == rNum,
-            TokenTypeExtensions.TokenType.Greater => lNum > rNum,
-            TokenTypeExtensions.TokenType.Less => lNum < rNum,
-            TokenTypeExtensions.TokenType.GreaterEqual => lNum >= rNum,
-            TokenTypeExtensions.TokenType.LessEqual => lNum <= rNum,
-            _ => throw new Exception("Operador booleano inválido.")
-        };
+        return binaryBoolean.Op.Type == TokenTypeExtensions.TokenType.And
+            ? (bool)left && (bool)right
+            : (bool)left || (bool)right;
     }
+
+    // 3) De lo contrario, deben ser comparaciones numéricas (==, <, >, <=, >=):
+    if (!(left  is int) || !(right is int))
+    {
+        throw new ErrorException(
+            "Operandos de comparación deben ser enteros.",
+            binaryBoolean.OriginToken.Line,
+            binaryBoolean.OriginToken.Position
+        );
+    }
+
+    int lNum = (int)left;
+    int rNum = (int)right;
+
+    return binaryBoolean.Op.Type switch
+    {
+        TokenTypeExtensions.TokenType.Equal        => lNum == rNum,
+        TokenTypeExtensions.TokenType.Greater      => lNum > rNum,
+        TokenTypeExtensions.TokenType.Less         => lNum < rNum,
+        TokenTypeExtensions.TokenType.GreaterEqual => lNum >= rNum,
+        TokenTypeExtensions.TokenType.LessEqual    => lNum <= rNum,
+        _ => throw new ErrorException(
+                 "Operador booleano inválido.",
+                 binaryBoolean.OriginToken.Line,
+                 binaryBoolean.OriginToken.Position
+             )
+    };
+}
+
 
     public object Visit(BinaryAritmethic binaryAritmethic)
+{
+    // 1) Evaluamos recursivamente ambos operandos
+    object? left  = evaluate(binaryAritmethic.Left);
+    object? right = evaluate(binaryAritmethic.Right);
+
+    // 2) Chequeamos que AMBOS sean int
+    if (!(left is int) || !(right is int))
     {
-        object left = evaluate(binaryAritmethic.Left);
-        object right = evaluate(binaryAritmethic.Right);
-
-        int l = Convert.ToInt32(left);
-        int r = Convert.ToInt32(right);
-            return binaryAritmethic.Op.Type switch
-        {
-            TokenTypeExtensions.TokenType.Plus => l + r,
-            TokenTypeExtensions.TokenType.Minus => l - r,
-            TokenTypeExtensions.TokenType.Multiply => l * r,
-            TokenTypeExtensions.TokenType.Divide => l / r,
-            TokenTypeExtensions.TokenType.Pow => Math.Pow(l, r),
-            TokenTypeExtensions.TokenType.Modulus => l % r,
-            _ => throw new Exception("Operador aritmético inválido")
-        };
-      
-
-        throw new Exception("Operandos no numéricos en operación aritmética");//ver lo de los errores
+        throw new ErrorException(
+            $"El operando debe ser de tipo Int.",
+            binaryAritmethic.OriginToken.Line,
+            binaryAritmethic.OriginToken.Position
+        );
     }
+
+    // 3) Como ya sabemos que left/right son int, hacemos el casting
+    int l = (int)left;
+    int r = (int)right;
+
+    // 4) Ejecutamos la operación aritmética
+    return binaryAritmethic.Op.Type switch
+    {
+        TokenTypeExtensions.TokenType.Plus      => l + r,
+        TokenTypeExtensions.TokenType.Minus     => l - r,
+        TokenTypeExtensions.TokenType.Multiply  => l * r,
+        TokenTypeExtensions.TokenType.Divide    => l / r,
+        TokenTypeExtensions.TokenType.Pow       => (int)Math.Pow(l, r),
+        TokenTypeExtensions.TokenType.Modulus   => l % r,
+        _ => throw new ErrorException(
+                 "Operador aritmético inválido.",
+                 binaryAritmethic.OriginToken.Line,
+                 binaryAritmethic.OriginToken.Position
+             )
+    };
+}
+
     public object Visit(UnaryExpression unaryExpression)
     {
         var value = evaluate(unaryExpression.Right);
@@ -189,7 +249,7 @@ public class Evaluate : IVisitor<object>
         if (value is int v)
             return -v;
 
-        throw new Exception("Operando no numérico en operación unaria");
+        throw new ErrorException("Operando no numérico en operación unaria",unaryExpression.OriginToken.Line, unaryExpression.OriginToken.Position);
     }
 
     public object Visit(FunctionCallNode node)
@@ -199,19 +259,19 @@ public class Evaluate : IVisitor<object>
         switch (node.FunctionName)
         {
             case "GetActualX":
-                ExpectTypes(args); // sin argumentos
+                ExpectTypes(node,args); // sin argumentos
                 return state.X;
 
             case "GetActualY":
-                ExpectTypes(args); // sin argumentos
+                ExpectTypes(node,args); // sin argumentos
                 return state.Y;
 
             case "GetCanvasSize":
-                ExpectTypes(args); // sin argumentos
+                ExpectTypes(node,args); // sin argumentos
                 return state.CanvasSize;
 
             case "GetColorCount":
-                ExpectTypes(args, typeof(string), typeof(int), typeof(int), typeof(int), typeof(int));
+                ExpectTypes(node,args, typeof(string), typeof(int), typeof(int), typeof(int), typeof(int));
                 string targetColor = Convert.ToString(args[0]);
                 int count = 0;
                 int x1 = Convert.ToInt32(args[1]);
@@ -232,17 +292,17 @@ public class Evaluate : IVisitor<object>
                 return count;
 
             case "IsBrushColor":
-                ExpectTypes(args, typeof(string));
+                ExpectTypes(node,args, typeof(string));
                 if (state.BrushColor == (string)args[0]) return 1;
                 return 0;
 
             case "IsBrushSize":
-                ExpectTypes(args, typeof(int));
+                ExpectTypes(node,args, typeof(int));
                 if (state.BrushSize == (int)args[0]) return 1;
                 return 0;
 
             case "IsCanvasColor":
-                ExpectTypes(args, typeof(string), typeof(int), typeof(int));
+                ExpectTypes(node,args, typeof(string), typeof(int), typeof(int));
                 string col = Convert.ToString(args[0]);
                 int v = Convert.ToInt32(args[1]);
                 int h = Convert.ToInt32(args[2]);
@@ -254,13 +314,14 @@ public class Evaluate : IVisitor<object>
                 return 0;
 
             default:
-                throw new Exception($"Función desconocida: {node.FunctionName}");
+                throw new ErrorException($"Función desconocida: {node.FunctionName}",node.OriginToken.Line,node.OriginToken.Position);
         }
     }
 
 
-    public object? Visit(GroupingExpr groupingExpr)
+    public object Visit(GroupingExpr groupingExpr)
     {
+        Console.WriteLine($"--> Entré a Visit(GroupingExpr). TokenOrigen = {groupingExpr.OriginToken.Type}");
         return evaluate(groupingExpr.Group);
     }
     public object Visit(Number number)
@@ -273,22 +334,41 @@ public class Evaluate : IVisitor<object>
         return stringNode.Value;
     }
 
-    public object? evaluate(ASTNode expr)
+    public object evaluate(ASTNode expr)
+{
+    var result = expr.Accept(this);
+    if (result == null)
     {
-        return expr.Accept(this);
+        throw new ErrorException(
+            "Error: la expresión no devolvió ningún valor.",
+            expr.OriginToken.Line,
+            expr.OriginToken.Position
+        );
     }
+    return result;
+}
 
-    private void ExpectTypes(List<object> args, params Type[] expected)
+
+    private void ExpectTypes(ASTNode nodo, List<object?> args, params Type[] expected)
+{
+    if (args.Count != expected.Length)
+        throw new ErrorException(
+            $"Se esperaban {expected.Length} argumentos.",
+            nodo.OriginToken.Line,
+            nodo.OriginToken.Position
+        );
+
+    for (int i = 0; i < expected.Length; i++)
     {
-        if (args.Count != expected.Length)
-            throw new Exception($"Se esperaban {expected.Length} argumentos.");
-
-        for (int i = 0; i < expected.Length; i++)
-        {
-            if (args[i] == null || args[i].GetType() != expected[i])
-                throw new Exception($"El argumento {i + 1} debe ser de tipo {expected[i].Name}");
-        }
+        if (args[i] == null || !expected[i].IsInstanceOfType(args[i]))
+            throw new ErrorException(
+                $"El argumento {i + 1} debe ser de tipo {expected[i].Name}.",
+                nodo.OriginToken.Line,
+                nodo.OriginToken.Position
+            );
     }
+}
+
 
     private bool EsValido(int x, int y)
     {
@@ -297,6 +377,21 @@ public class Evaluate : IVisitor<object>
             return false;
         }
         return true;
+    }
+
+     private void CheckTypeOperand(ASTNode node,Type expectedType,params object?[] operands)
+    {
+        foreach (var item in operands)
+        {
+            if (item == null || !expectedType.IsInstanceOfType(item))
+            {
+                throw new ErrorException(
+                    $"El operando debe ser de tipo {expectedType.Name}.",
+                    node.OriginToken.Line,
+                    node.OriginToken.Position
+                );
+            }
+        }
     }
     public IReadOnlyDictionary<string, object> Memory => memory;
     public WallEState State => state;

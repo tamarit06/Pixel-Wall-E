@@ -19,30 +19,36 @@ public static class ASTPrinter
             Console.WriteLine($"{indent}└── Unary Expression: {u.Operator.Lexeme}");
             Print(u.Right, indent + (isLast ? "    " : "│   "), false);
         }
-        else if (node is BinaryExpression b)
-        {
-            Console.WriteLine($"{indent}└── Binary Expression: {b.Op.Lexeme}");
-            Print(b.Left, indent + (isLast ? "    " : "│   "), false);
-            Print(b.Right, indent + (isLast ? "    " : "│   "), true);
-        }
+       else if (node is BinaryAritmethic ar)
+{
+    Console.WriteLine($"{indent}└── Binary Aritmethic: {ar.Op.Lexeme}");
+    Print(ar.Left, indent + (isLast ? "    " : "│   "), false);
+    Print(ar.Right, indent + (isLast ? "    " : "│   "), true);
+}
+else if (node is BinaryBoolean bb)
+{
+    Console.WriteLine($"{indent}└── Binary Boolean: {bb.Op.Lexeme}");
+    Print(bb.Left, indent + (isLast ? "    " : "│   "), false);
+    Print(bb.Right, indent + (isLast ? "    " : "│   "), true);
+}
         else if (node is Assignment a) // Manejo de nodos de asignación
         {
             Console.WriteLine($"{indent}└── Assignment: {a.NameVariable} <-");
             Print(a.Value, indent + (isLast ? "    " : "│   "), true);
         }
 
-         else if (node is FunctionCallNode f)
+        else if (node is FunctionCallNode f)
         {
             Console.WriteLine($"{indent}└── Function Call: {f.FunctionName}");
             for (int i = 0; i < f.Arguments.Count; i++)
             {
-                bool lastArg = (i == f.Arguments.Count -1);
+                bool lastArg = (i == f.Arguments.Count - 1);
                 Print(f.Arguments[i], indent + (isLast ? "    " : "│   "), lastArg);
             }
         }
-         else if (node is GoTo g) // Manejo de nodos de GoTo
+        else if (node is GoTo g) // Manejo de nodos de GoTo
         {
-            Console.WriteLine($"{indent}└── GoTo: {g.Label}");
+            Console.WriteLine($"{indent}└── GoTo: {g.LabelName}");
             if (g.Condition != null)
             {
                 Console.WriteLine($"{indent}    └── Condition:");
@@ -54,7 +60,7 @@ public static class ASTPrinter
             Console.WriteLine($"{indent}└── Label: {l.Value}");
         }
 
-         else if (node is InstructionNode instr) // Nueva sección para instrucciones
+        else if (node is InstructionNode instr) // Nueva sección para instrucciones
         {
             Console.WriteLine($"{indent}└── Instruction: {instr.InstructionName}");
             for (int i = 0; i < instr.Parameters.Count; i++)

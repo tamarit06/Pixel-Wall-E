@@ -3,9 +3,9 @@ public class InstructionNode : ASTNode
     public string InstructionName { get; }
     public List<ASTNode> Parameters { get; }
 
-    public InstructionNode(string name, List<ASTNode> parameters)
+    public InstructionNode(Token instToken, List<ASTNode> parameters):base(instToken)
     {
-        InstructionName = name;
+        InstructionName = instToken.Lexeme;
         Parameters = parameters;
     }
      public override T Accept<T>(IVisitor<T> visitor)

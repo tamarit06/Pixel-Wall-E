@@ -1,15 +1,14 @@
 public class GoTo : ASTNode
 {
-    public string Label { get; }
+    public string LabelName { get; }
     public ASTNode Condition { get; }
 
-    public GoTo(string label, ASTNode condition)
+    public GoTo(Token originToken, string labelName, ASTNode condition)
+        : base(originToken)
     {
-        Label = label;
+        LabelName = labelName;
         Condition = condition;
     }
-     public override T Accept<T>(IVisitor<T> visitor)
-    {
-        return visitor.Visit(this);
-    }
+
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 }

@@ -1,8 +1,9 @@
-public class GroupingExpr: ASTNode
+public class GroupingExpr : ASTNode
 {
-    public ASTNode Group { get; private set; }
+    public ASTNode Group { get; }
 
-    public GroupingExpr(ASTNode group)
+    public GroupingExpr(Token originToken, ASTNode group)
+        : base(originToken)  // Guarda el token en la clase base ASTNode
     {
         Group = group;
     }

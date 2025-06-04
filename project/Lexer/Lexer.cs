@@ -9,7 +9,8 @@ public class Lexer
     private readonly string Input;
     private int Position;
     private int Line;
-    public List<Token> Tokens { get; set; }
+    public List<Token> Tokens { get; private set; }
+    public List<ErrorException> Errores { get; } = new();
 
     public Lexer(string input)
     {
@@ -28,7 +29,7 @@ public class Lexer
                 if (Input[Position] == '\n')
                 {
                     Line++;
-                    AddToken(TokenType.EOL,"\\n");
+                    AddToken(TokenType.EOL, "\\n");
                 }
                 Position++;
                 continue;
@@ -41,7 +42,7 @@ public class Lexer
                 var regex = new Regex(entry.Value);
                 var match = regex.Match(Input.Substring(Position));
 
-                if (match.Success && match.Index == 0  && match.Length > 0)
+                if (match.Success && match.Index == 0 && match.Length > 0)
                 {
                     string value = match.Value;
                     TokenType type = entry.Key;
@@ -49,15 +50,18 @@ public class Lexer
                     AddToken(type, value);
                     Position += match.Length;
                     matched = true;
-                    break; // solo rompemos si hubo match
+                    break;
                 }
             }
+
             if (!matched)
             {
-                AddToken(TokenType.Desconocido, Input[Position].ToString());
-                Position++;
+                string ch = Input[Position].ToString();
+                Errores.Add(new ErrorException($"Símbolo inválido: '{ch}'", Line, Position));
+                Position++; // sigue al próximo carácter
             }
         }
+
         AddToken(TokenType.EOF, "EOF");
         return Tokens;
     }

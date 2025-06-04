@@ -4,7 +4,7 @@ public class Variable : ASTNode
 {
     public string Name { get; }
 
-    public Variable(Token token)
+    public Variable(Token token):base(token)
     {
         Name = token.Lexeme;
     }

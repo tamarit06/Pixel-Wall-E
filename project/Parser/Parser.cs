@@ -13,6 +13,9 @@ public class Parser
     // Contendrá nombres de etiquetas referenciadas por GoTo y cuántas veces se usan
     private Dictionary<string, int> gotoReferences = new Dictionary<string, int>();
     // Clase para almacenar info de cada etiqueta
+
+    public List<string> Errores { get; } = new(); //lista de errores
+
     private class LabelInfo
     {
         public int Line { get; set; }
@@ -31,42 +34,66 @@ public class Parser
 
     public ASTNode Parsind()
     {
-        // Verificar si el primer nodo es Spawn
+        List<ErrorException> errores = new();
+
+        // Verificar que comienza con Spawn
         if (Check(TokenType.Identifier) && Peek().Lexeme == "Spawn")
         {
-            // Método para parsear la instrucción Spawn
-            var spawnNode = ParseGenericInstruction();
-            Nodos.Add(spawnNode);
-            // Marcar que Spawn ha sido usado
-            spawnUsado = true;
+            try
+            {
+                var spawnNode = ParseGenericInstruction();
+                Nodos.Add(spawnNode);
+                spawnUsado = true;
+            }
+            catch (ErrorException e)
+            {
+                errores.Add(e);
+                Synchronize();
+            }
         }
         else
         {
-            throw new ParserException("Se esperaba la instrucción 'Spawn(int x,int y)' al inicio del código.", Peek().Line, Peek().Position);
+            errores.Add(new ErrorException("Se esperaba la instrucción 'Spawn(int x,int y)' al inicio del código.", Peek().Line, Peek().Position));
+            Synchronize();
         }
+
+        // Parsear el resto de las instrucciones
         while (!IsAtEnd)
         {
             if (Check(TokenType.EOL))
             {
-                Advance(); // Consumir el EOL
-                continue; // Saltar a la siguiente iteración
+                Advance(); // Saltar líneas vacías
+                continue;
             }
-            var stmt = ParseStatement();
-            if (stmt != null)
-                Nodos.Add(stmt);
-        }
-         ValidateLabelsAndGoTos();
-        
-        if (Nodos.Count == 0)
-        {
-            throw new ParserException("No se encontraron nodos en la entrada.", Peek().Line, Peek().Position);
+
+            try
+            {
+                var stmt = ParseStatement();
+                if (stmt != null)
+                    Nodos.Add(stmt);
+            }
+            catch (ErrorException e)
+            {
+                errores.Add(e);
+                Synchronize(); // Saltar al siguiente punto seguro
+            }
         }
 
-        return Nodos[0]; // Retorna el primer nodo si existe
+        // Mostrar errores al final si existen(cambiar)
+        if (errores.Count > 0)
+        {
+            Console.WriteLine(">>> Errores sintacticos:");
+            foreach (var e in errores)
+            {
+                Console.WriteLine($"[Línea {e.Line}, Pos {e.Position}] {e.Message}");
+            }
+        }
+        ValidateLabelsAndGoTos();
+        return Nodos[0];
     }
 
 
-    private ASTNode ParseStatement()
+    private ASTNode? ParseStatement()
     {
         if (IsAtEnd) return null;
 
@@ -76,7 +103,7 @@ public class Parser
             return ParseGenericInstruction();
 
         }
-        
+
         //Goto
         if (Peek().Type == TokenType.GoTo)
         {
@@ -95,7 +122,7 @@ public class Parser
         }
 
         // Manejo de otras instrucciones
-        throw new ParserException($"Instrucción no reconocida: {Peek().Lexeme}", Peek().Line, Peek().Position);
+        throw new ErrorException($"Instrucción no reconocida: {Peek().Lexeme}", Peek().Line, Peek().Position);
     }
 
     private ASTNode ParseGenericInstruction()
@@ -105,10 +132,17 @@ public class Parser
             // Si ya se usó Spawn, error
             if (spawnUsado)
             {
-                throw new ParserException("La instrucción 'Spawn' solo puede aparecer una vez.", Peek().Line, Peek().Position);
+                throw new ErrorException("La instrucción 'Spawn' solo puede aparecer una vez.", Peek().Line, Peek().Position);
             }
         }
-        var name = Consume(TokenType.Identifier, "Se esperaba nombre de instrucción").Lexeme;
+        Token nameToken = Consume(TokenType.Identifier, "Se esperaba nombre de instrucción");
+
+        // Verifica que sea una instrucción válida
+        if (!TokenTypeExtensions.Instructions.Contains(nameToken.Lexeme))
+        {
+            throw new ErrorException($"'{nameToken.Lexeme}' no es una instrucción válida",
+             nameToken.Line, nameToken.Position);
+        }
 
         Consume(TokenType.OpenParen, "Se esperaba '('");
 
@@ -124,47 +158,54 @@ public class Parser
 
         Consume(TokenType.CloseParen, "Se esperaba ')'");
         ConsumeEOL();
-        return new InstructionNode(name, parameters);
+        return new InstructionNode(nameToken, parameters);
     }
 
-    private ASTNode ParseGoTo()//ver esto
+     private ASTNode ParseGoTo()
     {
-        Consume(TokenType.GoTo, "Se esperaba 'GoTo'");
+        // Guardamos token “GoTo” de origen
+        Token gotoToken = Consume(TokenType.GoTo, "Se esperaba 'GoTo'");
 
         Consume(TokenType.OpenBracket, "Se esperaba '['");
-        var labelName = Consume(TokenType.Identifier, "Se esperaba el nombre de una etiqueta").Lexeme;
+        Token labelToken = Consume(TokenType.Identifier, "Se esperaba nombre de etiqueta");
+        string labelName = labelToken.Lexeme;
         Consume(TokenType.CloseBracket, "Se esperaba ']'");
 
+        // Contar referencias para validación posterior
         if (!gotoReferences.ContainsKey(labelName))
-        {
             gotoReferences[labelName] = 0;
-        }
         gotoReferences[labelName]++;
+
         Consume(TokenType.OpenParen, "Se esperaba '('");
-
-        var condition = Or();
-
+        ASTNode condition = Or();
         Consume(TokenType.CloseParen, "Se esperaba ')'");
         ConsumeEOL();
-        return new GoTo(labelName, condition);
+
+        // Creamos GoTo con su token de origen (gotoToken)
+        return new GoTo(gotoToken, labelName, condition);
     }
-
-    private ASTNode LabelParse()
+     private ASTNode LabelParse()
     {
-        var labelToken = Consume(TokenType.Identifier, "Se esperaba nombre de etiqueta");
+        // Token de la etiqueta
+        Token labelToken = Consume(TokenType.Identifier, "Se esperaba nombre de etiqueta");
+        string labelName = labelToken.Lexeme;
 
-        if (labels.ContainsKey(labelToken.Lexeme))
+        if (labels.ContainsKey(labelName))
         {
-            throw new ParserException($"Etiqueta duplicada: '{labelToken.Lexeme}'", labelToken.Line, labelToken.Position);
+            throw new ErrorException(
+                $"Etiqueta duplicada: '{labelName}'",
+                labelToken.Line, labelToken.Position);
         }
-        labels[labelToken.Lexeme] = new LabelInfo
+
+        labels[labelName] = new LabelInfo
         {
             Line = labelToken.Line,
             Position = labelToken.Position,
             Used = false
         };
+
         ConsumeEOL();
-        return new Label(labelToken.Lexeme);
+        return new Label(labelToken);
     }
 
     private ASTNode AssignmentParse()
@@ -176,7 +217,7 @@ public class Parser
         var expression = Or();
         ConsumeEOL();
 
-        return new Assignment(variable.Lexeme, expression);
+        return new Assignment(variable, expression);
     }
 
     // 1. Máximo nivel (lógico OR)
@@ -285,7 +326,7 @@ public class Parser
     //9 Funciones
     private ASTNode FunctionCall()
     {
-        var name = Consume(TokenType.Identifier, "Se esperaba nombre de función").Lexeme;
+        Token name = Consume(TokenType.Identifier, "Se esperaba nombre de función");
 
         Consume(TokenType.OpenParen, "Se esperaba '('");
 
@@ -322,28 +363,29 @@ public class Parser
 
         if (Match(TokenType.OpenParen))
         {
-            Advance(); // consume '('
+            Token open=Advance(); // '('
             var expr = Or();//cambiar
             Consume(TokenType.CloseParen, "Esperaba ')'");
-            return new GroupingExpr(expr);
+            return new GroupingExpr(open,expr);
         }
 
-        throw new ParserException($"Expresión inesperada: {Peek().Lexeme}", Peek().Line, Peek().Position);
+        throw new ErrorException($"Expresión inesperada: {Peek().Lexeme}", Peek().Line, Peek().Position);
     }
 
     private bool IsAtEnd => position >= lexer.Tokens.Count;
 
     private Token Peek()
-    {
-        if (IsAtEnd)
-            throw new ParserException("No hay más tokens para procesar.", Peek().Line, Peek().Position);
-        return lexer.Tokens[position]; // Devuelve el token actual sin avanzar
-    }
+{
+    if (IsAtEnd)
+        throw new ErrorException("No hay más tokens para procesar.", 0, 0);
+    
+    return lexer.Tokens[position];
+}
 
     private Token Previous()
     {
         if (position == 0)
-            throw new ParserException("No hay token anterior.", Peek().Line, Peek().Position);
+            throw new ErrorException("No hay token anterior.", Peek().Line, Peek().Position);
         return lexer.Tokens[position - 1]; // Devuelve el token anterior
     }
 
@@ -364,7 +406,7 @@ public class Parser
         {
             return lexer.Tokens[position++]; // Devuelve el token actual y avanza la posición
         }
-        throw new ParserException("No hay más tokens para procesar.", Peek().Line, Peek().Position);
+        throw new ErrorException("No hay más tokens para procesar.", Peek().Line, Peek().Position);
     }
 
 
@@ -387,7 +429,7 @@ public class Parser
 
         // Solo llama a Previous si hay un token anterior
         string previousLexeme = position > 0 ? Previous().Lexeme : "N/A";
-        throw new ParserException($"{message} (en token '{previousLexeme}')", Peek().Line, Peek().Position);
+        throw new ErrorException($"{message} (en token '{previousLexeme}')", Peek().Line, Peek().Position);
     }
 
     private void ConsumeEOL()
@@ -398,7 +440,7 @@ public class Parser
         }
         else
         {
-            throw new ParserException("Se esperaba un salto de línea", Peek().Line, Peek().Position);
+            throw new ErrorException("Se esperaba un salto de línea", Peek().Line, Peek().Position);
         }
     }
 
@@ -412,12 +454,12 @@ public class Parser
                 if (position > 0)
                 {
                     var lastToken = lexer.Tokens[position - 1];
-                    throw new ParserException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.",
+                    throw new ErrorException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.",
                         lastToken.Line, lastToken.Position);
                 }
                 else
                 {
-                     throw new ParserException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.", 0, 0);
+                    throw new ErrorException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.", 0, 0);
                 }
             }
             else
@@ -425,23 +467,38 @@ public class Parser
                 labels[goToLabel].Used = true;
             }
         }
-        
-         // Opcional: mostrar advertencia o error si hay etiquetas no referenciadas
+
+        // Opcional: mostrar advertencia o error si hay etiquetas no referenciadas
         foreach (var label in labels)
         {
             if (!label.Value.Used)
             {
-                   if (position > 0)
+                if (position > 0)
                 {
                     var lastToken = lexer.Tokens[position - 1];
-                    throw new ParserException("Etiqueta no referenciada",lastToken.Line, lastToken.Position);
+                    throw new ErrorException("Etiqueta no referenciada", lastToken.Line, lastToken.Position);
                 }
                 else
                 {
-                     throw new ParserException("Etiqueta no referenciada", 0, 0);
+                    throw new ErrorException("Etiqueta no referenciada", 0, 0);
                 }
             }
         }
     }
+    
+    private void Synchronize()
+{
+    while (!IsAtEnd)
+    {
+        var tipo = Peek().Type;
+
+        if (tipo == TokenTypeExtensions.TokenType.EOL || tipo == TokenTypeExtensions.TokenType.EOF)
+        {
+            Advance();
+            return;
+        }
+        Advance();
+    }
+}
 
 }

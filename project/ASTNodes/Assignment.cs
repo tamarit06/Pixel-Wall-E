@@ -3,9 +3,9 @@ public class Assignment : ASTNode
     public string NameVariable { get; }
     public ASTNode Value { get; }
 
-    public Assignment(string nameVal, ASTNode value)
+    public Assignment(Token token, ASTNode value):base(token)
     {
-        NameVariable = nameVal;
+        NameVariable = token.Lexeme;
         Value = value;
     }
     

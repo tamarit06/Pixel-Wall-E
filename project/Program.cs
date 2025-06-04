@@ -1,11 +1,11 @@
-﻿using System.Data;
+﻿using System;
 
 class Program
 {
     static void Main(string[] args)
     {
         string codigoFuente =
-        @"Spawn(0, 0)
+        @" Spawn(0, 0)
  Color(""Black"")
  n <- 5
  k <- 3 + 3 * 10

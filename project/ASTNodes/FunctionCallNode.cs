@@ -3,9 +3,9 @@ public class FunctionCallNode : ASTNode
     public string FunctionName { get; }
     public List<ASTNode> Arguments { get; }
 
-    public FunctionCallNode(string name, List<ASTNode> arguments)
+    public FunctionCallNode(Token token, List<ASTNode> arguments):base(token)
     {
-        FunctionName = name;
+        FunctionName =token.Lexeme;
         Arguments = arguments;
     }
      public override T Accept<T>(IVisitor<T> visitor)

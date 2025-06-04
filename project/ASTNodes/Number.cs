@@ -1,11 +1,9 @@
 public class Number : ASTNode
 {
-    public Token Num { get; private set; }
     public int Value { get; private set; }
 
-    public Number(Token num)
+    public Number(Token num) : base(num)
     {
-        Num = num;
         Value = int.Parse(num.Lexeme);
     }
 
