@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5h3vycg3yoji"]
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_rlixt"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.109804, 1, 1, 1)
+
+[node name="CodeEdit" type="CodeEdit" parent="."]
+layout_mode = 0
+offset_left = 114.0
+offset_top = 80.0
+offset_right = 975.0
+offset_bottom = 1016.0
+syntax_highlighter = SubResource("CodeHighlighter_rlixt")
+gutters_draw_breakpoints_gutter = true
+gutters_draw_bookmarks = true
+gutters_draw_executing_lines = true
+gutters_draw_line_numbers = true
+gutters_zero_pad_line_numbers = true
+gutters_draw_fold_gutter = true
+
+[node name="TextEdit" type="TextEdit" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
