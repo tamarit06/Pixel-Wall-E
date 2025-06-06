@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://c5h3vycg3yoji"]
+[gd_scene load_steps=3 format=3 uid="uid://c5h3vycg3yoji"]
+
+[ext_resource type="Script" uid="uid://t6vouoy6w3dk" path="res://Scripts/Main.cs" id="1_f6udf"]
 
 [sub_resource type="CodeHighlighter" id="CodeHighlighter_rlixt"]
 
@@ -9,22 +11,24 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_f6udf")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.109804, 1, 1, 1)
+color = Color(0.38037, 0.0462432, 0.133006, 1)
 
 [node name="CodeEdit" type="CodeEdit" parent="."]
 layout_mode = 0
-offset_left = 114.0
-offset_top = 80.0
-offset_right = 975.0
-offset_bottom = 1016.0
+offset_left = 71.0
+offset_top = 96.0
+offset_right = 852.0
+offset_bottom = 862.0
 syntax_highlighter = SubResource("CodeHighlighter_rlixt")
 gutters_draw_breakpoints_gutter = true
 gutters_draw_bookmarks = true
@@ -32,8 +36,54 @@ gutters_draw_executing_lines = true
 gutters_draw_line_numbers = true
 gutters_zero_pad_line_numbers = true
 gutters_draw_fold_gutter = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
 
 [node name="TextEdit" type="TextEdit" parent="."]
 layout_mode = 0
 offset_right = 8.0
 offset_bottom = 8.0
+
+[node name="TextureRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(800, 800)
+layout_mode = 0
+offset_left = 904.0
+offset_top = 99.0
+offset_right = 1664.0
+offset_bottom = 859.0
+
+[node name="RunButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 34.0
+offset_right = 163.0
+offset_bottom = 83.0
+text = "Run"
+
+[node name="SaveButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 196.0
+offset_top = 35.0
+offset_right = 273.0
+offset_bottom = 79.0
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 308.0
+offset_top = 34.0
+offset_right = 382.0
+offset_bottom = 82.0
+text = "Load"
+
+[node name="SpinBox" type="SpinBox" parent="."]
+layout_mode = 0
+offset_left = 427.0
+offset_top = 35.0
+offset_right = 514.0
+offset_bottom = 77.0
+min_value = 1.0
+max_value = 256.0
+value = 32.0
+
+[node name="FileDialog" type="FileDialog" parent="."]
