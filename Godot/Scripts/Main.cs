@@ -48,7 +48,7 @@ public partial class Main : Control
 		// No se asigna la propiedad Mode, ya que produce error en esta versión
 		fileDialogLoad.Filters = new string[] { "*.gw" };
 		AddChild(fileDialogLoad);
-		fileDialogLoad.FileSelected += _OnFileDialogSaveFileSelected;
+		fileDialogLoad.FileSelected += _OnFileDialogLoadFileSelected;
 
 		InicializarCanvas();
 		PintarCuadrícula();
@@ -61,11 +61,16 @@ public partial class Main : Control
 
 	public void OnSavePressed()
 	{
-
+		GD.Print("Guardar Código");
+        fileDialogSave.PopupCentered();
+        fileDialogSave.Size = new Vector2I(600, 400); // ancho x alto
 	}
 
 	public void OnLoadPressed()
 	{
+		 GD.Print("Cargar Código");
+        fileDialogLoad.PopupCentered();
+        fileDialogLoad.Size = new Vector2I(600, 400);
 
 	}
 	public void OnSpinBoxValueChanged(double newValue)
@@ -74,20 +79,34 @@ public partial class Main : Control
 		Dimension = (int)newValue;
 		PintarCuadrícula();
 	}
-	public void _OnFileDialogSaveFileSelected(string path)
-	{
-		GD.Print("Guardar Código");
-		fileDialogSave.PopupCentered();
-		fileDialogSave.Size = new Vector2I(600, 400); // ancho x alto
-		fileDialogLoad.Size = new Vector2I(600, 400);
-	}
-	public void _OnFileDialogLoadFileSelected(string path)
-	{
-		GD.Print("Cargar Código");
-		fileDialogLoad.PopupCentered();
-		fileDialogSave.Size = new Vector2I(600, 400); // ancho x alto
-		fileDialogLoad.Size = new Vector2I(600, 400);
-	}
+	  private void _OnFileDialogSaveFileSelected(string ruta)
+    {
+        GuardarArchivo(ruta);
+        PintarCuadrícula();
+        GD.Print("Archivo guardado en: " + ruta);
+    }
+    private void _OnFileDialogLoadFileSelected(string ruta)
+    {
+        CargarArchivo(ruta);
+        PintarCuadrícula();
+        GD.Print("Archivo cargado desde: " + ruta);
+    }
+    // Función para guardar el contenido del editor en un archivo
+    private void GuardarArchivo(string ruta)
+    {
+        var archivo = Godot.FileAccess.Open(ruta, Godot.FileAccess.ModeFlags.Write);
+        archivo.StoreString(codeEdit.GetText());
+        archivo.Close();
+    }
+    // Función para cargar el contenido de un archivo en el editor
+    private void CargarArchivo(string ruta)
+    {
+        Reset();
+        var archivo = Godot.FileAccess.Open(ruta, Godot.FileAccess.ModeFlags.Read);
+        string contenido = archivo.GetAsText();
+        archivo.Close();
+        codeEdit.SetText(contenido);
+    }
 	private void InicializarCanvas()
 	{
 		image = Image.CreateEmpty(BoardPixelsSize, BoardPixelsSize, false, Image.Format.Rgba8);
@@ -189,32 +208,12 @@ public partial class Main : Control
 					PintarCelda(x, y, new Color("Pink"));
 					continue;
 				}
-
-				Color godotColor = ConvertirColor(color);
 				// Pintar la celda en pantalla
-				PintarCelda(x, y, new Color(godotColor));
+				PintarCelda(x, y, new Color(color));
 			}
 
 		}
 		PintarCuadrícula();
-
-	}
-
-	private Color ConvertirColor(string colorName)
-	{
-		
-		return colorName switch
-		{
-			"Red" => Colors.Red,
-			"Blue" => Colors.Blue,
-			"Green" => Colors.Green,
-			"Yellow" => Colors.Yellow,
-			"Orange" => Colors.Black,
-			"White" => Colors.White,
-			"Purple" => Colors.Purple,
-			"Black" => Colors.Black,
-			_ => throw new ArgumentException($"Color no soportado '{colorName}'")
-		};
 
 	}
 }

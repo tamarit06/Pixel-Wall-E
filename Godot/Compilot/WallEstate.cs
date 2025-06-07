@@ -24,8 +24,6 @@ public class WallEState
         }
     }
 
-
-
     private bool EsValido(int x, int y)
     {
         return x >= 0 && y >= 0 && x < CanvasSize && y < CanvasSize;
@@ -36,20 +34,24 @@ public class WallEState
         if (x >= 0 && x < CanvasSize && y >= 0 && y < CanvasSize)
             Canvas[x, y] = BrushColor;
     }
-   public void DrawLine(int dx, int dy, int length)
+    public void DrawLine(int dx, int dy, int length)
     {
-        for (int i = 0; i < length; i++)
+        int offset = BrushSize / 2;
+        // Pintar el punto de inicio
+        SetBrushPixels(X, Y);
+
+        for (int i = 1; i <=length; i++)
         {
             X += dx;
             Y += dy;
-
-            int offset = BrushSize / 2;
-            for (int dxBrush = -offset; dxBrush <= offset; dxBrush++)
+            if (i < length)
             {
-                for (int dyBrush = -offset; dyBrush <= offset; dyBrush++)
-                {
-                    SetPixel(X + dxBrush, Y + dyBrush);
-                }
+                SetBrushPixels(X, Y);
+            }
+
+            else
+            {
+                SetPixel(X, Y);
             }
         }
     }
@@ -73,7 +75,7 @@ public class WallEState
         // 1) Avanza distance pasos
         X += dx * distance;
         Y += dy * distance;
-
+        
         // 2) Calcula semianchos en cada eje (width,height impares o pares funcionan)
         int halfW = width / 2;
         int halfH = height / 2;
@@ -105,9 +107,9 @@ public class WallEState
 
 private void MidpointCircle(int cx, int cy, int r)
 {
-    int x = r;
+    int x = r+1;
     int y = 0;
-    int err = 1 - r;
+    int err = 1 -r;
 
     while (x >= y)
     {
