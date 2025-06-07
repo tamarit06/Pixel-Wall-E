@@ -4,7 +4,7 @@ public class WallEState
 {
     public int X { get; set; }
     public int Y { get; set; }
-    public string BrushColor { get; set; } = "\"Black\"";
+    public string BrushColor { get; set; } = "Black";
     public int BrushSize { get; set; } = 1;
     public int CanvasSize;
 
@@ -17,9 +17,9 @@ public class WallEState
         Canvas = new string[CanvasSize, CanvasSize];
         for (int i = 0; i < canvasSize; i++)
         {
-            for (int j= 0; j < canvasSize; j++)
+            for (int j = 0; j < canvasSize; j++)
             {
-                Canvas[i, j] = "\"White\"";
+                Canvas[i, j] = "White";
             }
         }
     }
@@ -31,17 +31,26 @@ public class WallEState
         return x >= 0 && y >= 0 && x < CanvasSize && y < CanvasSize;
     }
 
-    public void DrawLine(int dx, int dy, int length)
+    public void SetPixel(int x, int y)
+    {
+        if (x >= 0 && x < CanvasSize && y >= 0 && y < CanvasSize)
+            Canvas[x, y] = BrushColor;
+    }
+   public void DrawLine(int dx, int dy, int length)
     {
         for (int i = 0; i < length; i++)
         {
-            if (EsValido(X, Y))
-            {
-                Canvas[X, Y] = BrushColor;
-                OnPixelPaint?.Invoke(X, Y, BrushColor);
-            }
             X += dx;
             Y += dy;
+
+            int offset = BrushSize / 2;
+            for (int dxBrush = -offset; dxBrush <= offset; dxBrush++)
+            {
+                for (int dyBrush = -offset; dyBrush <= offset; dyBrush++)
+                {
+                    SetPixel(X + dxBrush, Y + dyBrush);
+                }
+            }
         }
     }
 
@@ -61,54 +70,74 @@ public class WallEState
 
     public void DrawRectangle(int dx, int dy, int distance, int width, int height)
     {
-        int startX = X;
-        int startY = Y;
+        // 1) Avanza distance pasos
+        X += dx * distance;
+        Y += dy * distance;
 
-        for (int row = 0; row < height; row++)
+        // 2) Calcula semianchos en cada eje (width,height impares o pares funcionan)
+        int halfW = width / 2;
+        int halfH = height / 2;
+
+        // 3) Dibuja borde superior e inferior
+        for (int offsetX = -halfW; offsetX <= halfW; offsetX++)
         {
-            for (int col = 0; col < width; col++)
-            {
-                int px = startX + col * dx;
-                int py = startY + row * dy;
-
-                if (EsValido(px, py))
-                {
-                    Canvas[px, py] = BrushColor;
-                    OnPixelPaint?.Invoke(px, py, BrushColor);
-                }
-            }
+            // Y fijo en cima y base
+            SetBrushPixels(X + offsetX, Y - halfH);  // borde superior
+            SetBrushPixels(X + offsetX, Y + halfH);  // borde inferior
         }
 
-        // Mover el cursor final
-        X = startX + dx * distance;
-        Y = startY + dy * distance;
+        // 4) Dibuja borde izquierdo y derecho
+        for (int offsetY = -halfH; offsetY <= halfH; offsetY++)
+        {
+            SetBrushPixels(X - halfW, Y + offsetY);  // borde izquierdo
+            SetBrushPixels(X + halfW, Y + offsetY);  // borde derecho
+        }
     }
+   public void DrawCircle(int dx, int dy, int radius)
+{
+    // 1) Avanza radius pasos en la dirección (dx, dy)
+    X += dx * radius;
+    Y += dy * radius;
 
-    public void DrawCircle(int dx, int dy, int radius)
+    // 2) Dibuja la circunferencia de radio 'radius' centrada en (X, Y)
+    MidpointCircle(X, Y, radius);
+}
+
+private void MidpointCircle(int cx, int cy, int r)
+{
+    int x = r;
+    int y = 0;
+    int err = 1 - r;
+
+    while (x >= y)
     {
-        int centerX = X;
-        int centerY = Y;
+        // pinta los 8 puntos simétricos
+        SetBrushPixels(cx + x, cy + y);
+        SetBrushPixels(cx + y, cy + x);
+        SetBrushPixels(cx - y, cy + x);
+        SetBrushPixels(cx - x, cy + y);
+        SetBrushPixels(cx - x, cy - y);
+        SetBrushPixels(cx - y, cy - x);
+        SetBrushPixels(cx + y, cy - x);
+        SetBrushPixels(cx + x, cy - y);
 
-        for (int i = -radius; i <= radius; i++)
+        y++;
+        if (err < 0)
         {
-            for (int j = -radius; j <= radius; j++)
-            {
-                if (i * i + j * j <= radius * radius)
-                {
-                    int px = centerX + i;
-                    int py = centerY + j;
-
-                    if (EsValido(px, py))
-                    {
-                        Canvas[px, py] = BrushColor;
-                        OnPixelPaint?.Invoke(px, py, BrushColor);
-                    }
-                }
-            }
+            err += 2 * y + 1;
         }
-
-        // Mover el cursor final
-        X = centerX + dx * radius;
-        Y = centerY + dy * radius;
+        else
+        {
+            x--;
+            err += 2 * (y - x + 1);
+        }
     }
+}
+    private void SetBrushPixels(int px, int py)
+{
+    int off = BrushSize / 2;
+    for (int dx = -off; dx <= off; dx++)
+        for (int dy = -off; dy <= off; dy++)
+            SetPixel(px + dx, py + dy);
+}
 }

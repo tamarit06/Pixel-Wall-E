@@ -28,7 +28,7 @@ layout_mode = 0
 offset_left = 71.0
 offset_top = 96.0
 offset_right = 852.0
-offset_bottom = 862.0
+offset_bottom = 885.0
 syntax_highlighter = SubResource("CodeHighlighter_rlixt")
 gutters_draw_breakpoints_gutter = true
 gutters_draw_bookmarks = true
@@ -47,10 +47,10 @@ offset_bottom = 8.0
 [node name="TextureRect" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(800, 800)
 layout_mode = 0
-offset_left = 904.0
-offset_top = 99.0
-offset_right = 1664.0
-offset_bottom = 859.0
+offset_left = 894.0
+offset_top = 29.0
+offset_right = 1881.0
+offset_bottom = 899.0
 
 [node name="RunButton" type="Button" parent="."]
 layout_mode = 0

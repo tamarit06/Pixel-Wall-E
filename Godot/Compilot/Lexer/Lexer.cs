@@ -68,6 +68,10 @@ public class Lexer
 
     private void AddToken(TokenType type, string lexeme)
     {
+         if (type == TokenType.String_)
+    {
+        lexeme = lexeme.Trim('"');
+    }
         Tokens.Add(new Token(type, lexeme, Line, Position));
     }
 }

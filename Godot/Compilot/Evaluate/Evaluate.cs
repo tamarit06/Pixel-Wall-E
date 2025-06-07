@@ -99,7 +99,7 @@ public class Evaluate : IVisitor<object>
                 node.OriginToken.Line,node.OriginToken.Position);
                 state.BrushSize = size;
                 break;
-            //hast aqui bien
+            
             case "DrawLine":
                 ExpectTypes(node,args, typeof(int), typeof(int), typeof(int));
                 int dx = Convert.ToInt32(args[0]);
@@ -124,7 +124,7 @@ public class Evaluate : IVisitor<object>
                 break;
 
             case "DrawCircle":
-                ExpectTypes(node,args, typeof(int), typeof(int), typeof(double));
+                ExpectTypes(node,args, typeof(int), typeof(int), typeof(int));
                 int dix = Convert.ToInt32(args[0]);
                 int diy = Convert.ToInt32(args[1]);
                 int r = Convert.ToInt32(args[2]);
