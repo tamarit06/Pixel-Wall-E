@@ -16,7 +16,7 @@ public class Parser
     private Dictionary<string, int> gotoReferences = new Dictionary<string, int>();
     // Clase para almacenar info de cada etiqueta
 
-    public List<string> Errores { get; } = new(); //lista de errores
+     public List<ErrorException> Errores { get; } = new List<ErrorException>();
 
     private class LabelInfo
     {
@@ -34,9 +34,10 @@ public class Parser
 
     private bool spawnUsado = false;
 
-    public ASTNode Parsind()
+    public void Parsind()
     {
-        List<ErrorException> errores = new();
+         Errores.Clear();
+        Nodos.Clear();
 
         // Verificar que comienza con Spawn
         if (Check(TokenType.Identifier) && Peek().Lexeme == "Spawn")
@@ -49,13 +50,13 @@ public class Parser
             }
             catch (ErrorException e)
             {
-                errores.Add(e);
+                Errores.Add(e);
                 Synchronize();
             }
         }
         else
         {
-            errores.Add(new ErrorException("Se esperaba la instrucción 'Spawn(int x,int y)' al inicio del código.", Peek().Line, Peek().Position));
+            Errores.Add(new ErrorException("Se esperaba la instrucción 'Spawn(int x,int y)' al inicio del código.", Peek().Line, Peek().Position));
             Synchronize();
         }
 
@@ -76,22 +77,13 @@ public class Parser
             }
             catch (ErrorException e)
             {
-                errores.Add(e);
+                Errores.Add(e);
                 Synchronize(); // Saltar al siguiente punto seguro
             }
         }
 
-        // Mostrar errores al final si existen(cambiar)
-        if (errores.Count > 0)
-        {
-            Console.WriteLine(">>> Errores sintacticos:");
-            foreach (var e in errores)
-            {
-                Console.WriteLine($"[Línea {e.Line}, Pos {e.Position}] {e.Message}");
-            }
-        }
+        
         ValidateLabelsAndGoTos();
-        return Nodos[0];
     }
 
 
@@ -456,12 +448,12 @@ public class Parser
                 if (position > 0)
                 {
                     var lastToken = lexer.Tokens[position - 1];
-                    throw new ErrorException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.",
-                        lastToken.Line, lastToken.Position);
+                    Errores.Add(new ErrorException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.",
+                        lastToken.Line, lastToken.Position));
                 }
                 else
                 {
-                    throw new ErrorException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.", 0, 0);
+                    Errores.Add(new ErrorException($"GoTo '{goToLabel}' no tiene una etiqueta correspondiente.", 0, 0));
                 }
             }
             else
@@ -478,11 +470,11 @@ public class Parser
                 if (position > 0)
                 {
                     var lastToken = lexer.Tokens[position - 1];
-                    throw new ErrorException("Etiqueta no referenciada", lastToken.Line, lastToken.Position);
+                    Errores.Add(new ErrorException("Etiqueta no referenciada", lastToken.Line, lastToken.Position));
                 }
                 else
                 {
-                    throw new ErrorException("Etiqueta no referenciada", 0, 0);
+                    Errores.Add(new ErrorException("Etiqueta no referenciada", 0, 0));
                 }
             }
         }

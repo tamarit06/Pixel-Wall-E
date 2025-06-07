@@ -13,4 +13,4 @@
  GoTo [loop1] (i < 10)
  Color("Blue")
  GoTo [loop1] (1 == 1)
- loop_ends_her
+ loop_ends_here

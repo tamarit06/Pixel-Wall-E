@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public partial class Main : Control
 {
@@ -27,6 +29,8 @@ public partial class Main : Control
 		saveButton = GetNode<Button>("SaveButton");
 		loadButton = GetNode<Button>("LoadButton");
 		spinBox = GetNode<SpinBox>("SpinBox");
+
+		
 
 		runButton.Pressed += OnRunPressed;
 		saveButton.Pressed += OnSavePressed;
@@ -166,29 +170,61 @@ public partial class Main : Control
 	}
 
 	public void Compiler()
-	{
-		string code = codeEdit.GetText();
-		Lexer lexer = new Lexer(code);
-		lexer.Tokenize();
+{
+		textEdit.Clear();
+    string code = codeEdit.GetText();
 
-		var parser = new Parser(lexer);
-		parser.Parsind();
-		WallEState canvas = new WallEState(Dimension);
+    // 1) LEXER
+    var lexer = new Lexer(code);
+    lexer.Tokenize();
 
-		var evaluator = new Evaluate(canvas);
-		evaluator.EvaluateProgram(parser.Nodos);
+    // Si hay errores de lexer, muéstralos y aborta
+    if (lexer.Errores.Count > 0)
+    {
+        ShowErrors(lexer.Errores.Select(e => e.Message));
+        return;
+    }
 
-		//ver q hacer con los errores
+    // 2) PARSER
+    var parser = new Parser(lexer);
+    parser.Parsind();
 
-		Reset();
-		Print(canvas);
+    // Si hay errores de parser, muéstralos y aborta
+    if (parser.Errores.Count > 0)
+    {
+        ShowErrors(parser.Errores.Select(e=>e.Message));
+        return;
+    }
 
-	}
+    // 3) EVALUADOR
+    var canvas    = new WallEState(Dimension);
+    var evaluator = new Evaluate(canvas);
+    evaluator.EvaluateProgram(parser.Nodos);
+
+    // Si hay errores de evaluación, muéstralos y aborta
+    if (evaluator.ErroresEvaluacion.Count > 0)
+    {
+        ShowErrors(evaluator.ErroresEvaluacion.Select(e=>e.Message));
+        return;
+    }
+
+    // 4) Si todo OK, limpia y pinta
+    Reset();
+    Print(canvas);
+}
+private void ShowErrors(IEnumerable<string> errores)
+{
+    textEdit.Text = "";      // vaciar consola
+    foreach (var msg in errores)
+        textEdit.Text += $"• {msg}\n";
+}
+
+	
 
 	public void Print(WallEState canvas)
 	{
 		// Asegurarnos de que el estado lógico coincida con la dimensión actual
-	   // canvas.CanvasSize = Dimension;
+		// canvas.CanvasSize = Dimension;
 
 		// Limpiar el canvas visual antes de pintar
 		Reset();

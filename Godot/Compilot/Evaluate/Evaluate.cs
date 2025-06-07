@@ -16,40 +16,40 @@ public class Evaluate : IVisitor<object>
         this.state = state;
     }
     private Dictionary<string, object> memory = new();
-    public List<string> ErroresEvaluacion { get; } = new List<string>();
+    public List<ErrorException> ErroresEvaluacion { get; } = new List<ErrorException>();
 
 
 
    public void EvaluateProgram(List<ASTNode> nodos)
-{
-    int i = 0;
-    while (i < nodos.Count)
     {
-        try
+        int i = 0;
+        while (i < nodos.Count)
         {
-            var result = evaluate(nodos[i]);
-
-            if (result is GoToResult goToResult)
+            try
             {
-                int newPos = nodos.FindIndex(n => n is Label label && label.Value == goToResult.Label);
-                if (newPos == -1)
+                var node = nodos[i];
+                var result = node.Accept(this);
+
+                if (result is GoToResult goToResult)
                 {
-                    ErroresEvaluacion.Add($"Etiqueta '{goToResult.Label}' no encontrada.");
-                    i++;
+                    int newPos = nodos.FindIndex(n => n is Label label && label.Value == goToResult.Label);
+                    if (newPos == -1)
+                    {
+                       // ErroresEvaluacion.Add(new ErrorException("Etiqueta '{goToResult.Label}' no encontrada.",));
+                        i++;
+                        continue;
+                    }
+                    i = newPos + 1;
                     continue;
                 }
-                i = newPos + 1;
-                continue;
             }
+            catch (ErrorException e)
+            {
+                ErroresEvaluacion.Add(e);
+            }
+            i++;
         }
-        catch (Exception e)
-        {
-            ErroresEvaluacion.Add(e.Message);
-        }
-
-        i++;
     }
-}
 
 
     public object? Visit(GoTo node)
@@ -330,7 +330,6 @@ public class Evaluate : IVisitor<object>
 
     public object Visit(GroupingExpr groupingExpr)
     {
-        Console.WriteLine($"--> Entré a Visit(GroupingExpr). TokenOrigen = {groupingExpr.OriginToken.Type}");
         return evaluate(groupingExpr.Group);
     }
     public object Visit(Number number)
