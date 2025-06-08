@@ -11,6 +11,7 @@ public partial class Main : Control
 	Button runButton;
 	Button saveButton;
 	Button loadButton;
+	Button resetButton;
 	SpinBox spinBox;
 	FileDialog fileDialogSave;
 	FileDialog fileDialogLoad;
@@ -28,6 +29,7 @@ public partial class Main : Control
 		runButton = GetNode<Button>("RunButton");
 		saveButton = GetNode<Button>("SaveButton");
 		loadButton = GetNode<Button>("LoadButton");
+		resetButton = GetNode<Button>("ResetButton");
 		spinBox = GetNode<SpinBox>("SpinBox");
 
 		
@@ -35,6 +37,7 @@ public partial class Main : Control
 		runButton.Pressed += OnRunPressed;
 		saveButton.Pressed += OnSavePressed;
 		loadButton.Pressed += OnLoadPressed;
+		resetButton.Pressed += OnResetPressed;
 		spinBox.ValueChanged += OnSpinBoxValueChanged;
 
 		// Crear y configurar el FileDialog para guardar archivos
@@ -42,6 +45,7 @@ public partial class Main : Control
 		// Usamos Filesystem en lugar de User
 		fileDialogSave.Access = FileDialog.AccessEnum.Filesystem;
 		// No se asigna la propiedad Mode, ya que produce error en esta versión
+		fileDialogSave.FileMode = FileDialog.FileModeEnum.SaveFile;
 		fileDialogSave.Filters = new string[] { "*.gw" };
 		AddChild(fileDialogSave);
 		fileDialogSave.FileSelected += _OnFileDialogSaveFileSelected;
@@ -49,6 +53,7 @@ public partial class Main : Control
 		// Crear y configurar el FileDialog para cargar archivos
 		fileDialogLoad = new FileDialog();
 		fileDialogLoad.Access = FileDialog.AccessEnum.Filesystem;
+		fileDialogLoad.FileMode = FileDialog.FileModeEnum.OpenAny;
 		// No se asigna la propiedad Mode, ya que produce error en esta versión
 		fileDialogLoad.Filters = new string[] { "*.gw" };
 		AddChild(fileDialogLoad);
@@ -65,17 +70,20 @@ public partial class Main : Control
 
 	public void OnSavePressed()
 	{
-		GD.Print("Guardar Código");
         fileDialogSave.PopupCentered();
-        fileDialogSave.Size = new Vector2I(600, 400); // ancho x alto
+        fileDialogSave.Size = new Vector2I(600, 400); 
 	}
 
 	public void OnLoadPressed()
 	{
-		 GD.Print("Cargar Código");
         fileDialogLoad.PopupCentered();
         fileDialogLoad.Size = new Vector2I(600, 400);
 
+	}
+	public void OnResetPressed()
+	{
+		Reset();
+		PintarCuadrícula();
 	}
 	public void OnSpinBoxValueChanged(double newValue)
 	{
@@ -236,7 +244,6 @@ private void ShowErrors(IEnumerable<string> errores)
 			{
 				// Obtener el nombre del color desde el estado lógico
 				string color = canvas.Canvas[x, y];
-				GD.Print(color);
 				// Convertirlo a un Color de Godot
 				if (color == "Transparent") continue;
 				if (x == canvas.X && y == canvas.Y)

@@ -10,7 +10,7 @@ public class TokenTypeExtensions
 
  public static readonly HashSet<string> Instructions = new HashSet<string>
 {
-    "Spawn", "Color", "Size", "DrawLine", "DrawCircle", "DrawRectangle", "Fill", 
+    "Spawn", "Color", "Size", "DrawLine", "DrawCircle", "DrawRectangle", "Fill", "MoveWalle"
 };
 
     static TokenTypeExtensions()

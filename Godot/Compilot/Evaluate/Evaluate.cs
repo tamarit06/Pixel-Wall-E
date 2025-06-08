@@ -2,11 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-public class GoToResult
-{
-    public string Label { get; }
-    public GoToResult(string label) => Label = label;
-}
+using System.Linq.Expressions;
 public class Evaluate : IVisitor<object>
 {
      private WallEState state;
@@ -18,29 +14,32 @@ public class Evaluate : IVisitor<object>
     private Dictionary<string, object> memory = new();
     public List<ErrorException> ErroresEvaluacion { get; } = new List<ErrorException>();
 
-
-
-   public void EvaluateProgram(List<ASTNode> nodos)
+    public void EvaluateProgram(List<ASTNode> nodos)
     {
+        ErroresEvaluacion.Clear();
         int i = 0;
         while (i < nodos.Count)
         {
             try
             {
                 var node = nodos[i];
-                var result = node.Accept(this);
 
-                if (result is GoToResult goToResult)
+                if (node is GoTo goToNode)
                 {
-                    int newPos = nodos.FindIndex(n => n is Label label && label.Value == goToResult.Label);
-                    if (newPos == -1)
+                    var cond = evaluate(goToNode.Condition);
+                    if (cond is bool b && b)
                     {
-                       // ErroresEvaluacion.Add(new ErrorException("Etiqueta '{goToResult.Label}' no encontrada.",));
-                        i++;
-                        continue;
+                        int newPos = nodos.FindIndex(n =>
+                            n is Label lbl && lbl.Value == goToNode.LabelName);
+                    
+                            i = newPos + 1;
+                            continue; 
+                        
                     }
-                    i = newPos + 1;
-                    continue;
+                }
+                else
+                {
+                    node.Accept(this);
                 }
             }
             catch (ErrorException e)
@@ -50,16 +49,9 @@ public class Evaluate : IVisitor<object>
             i++;
         }
     }
-
-
     public object? Visit(GoTo node)
     {
-        var condition = evaluate(node.Condition); // Evalúa la condición
-        if (condition is bool b && b) // Si la condición es verdadera
-        {
-            return new GoToResult(node.LabelName); // Retorna un GoToResult con la etiqueta
-        }
-        return null; // Si la condición es falsa, no se realiza el salto
+        return null;
     }
 
     public object? Visit(Label node)
@@ -108,7 +100,15 @@ public class Evaluate : IVisitor<object>
                 if (Math.Abs(dx) > 1 || Math.Abs(dy) > 1)
                 throw new ErrorException("Dirección inválida. dx y dy deben ser -1, 0 o 1.",
                 node.OriginToken.Line,node.OriginToken.Position);
-                state.DrawLine(dx, dy, length);
+                try
+                {
+                    state.DrawLine(dx, dy, length);
+                }
+                catch
+                {
+                    throw new ErrorException("Walle fuera del canvas",node.OriginToken.Line,node.OriginToken.Position);
+                }
+
                 break;
             case "DrawRectangle":
                 ExpectTypes(node,args, typeof(int), typeof(int), typeof(int), typeof(int), typeof(int));
@@ -120,7 +120,15 @@ public class Evaluate : IVisitor<object>
                 if (Math.Abs(dirx) > 1 || Math.Abs(diry) > 1)
                 throw new ErrorException("Dirección inválida. dx y dy deben ser -1, 0 o 1.",
                 node.OriginToken.Line,node.OriginToken.Position);
-                state.DrawRectangle(dirx, diry, dist, w, h);
+                try
+                {
+                    state.DrawRectangle(dirx, diry, dist, w, h);
+                }
+                catch
+                {
+                  throw new ErrorException("Walle fuera del canvas",node.OriginToken.Line,node.OriginToken.Position);
+                }
+                
                 break;
 
             case "DrawCircle":
@@ -131,14 +139,35 @@ public class Evaluate : IVisitor<object>
                 if (Math.Abs(dix) > 1 || Math.Abs(diy) > 1)
                 throw new ErrorException("Dirección inválida. dx y dy deben ser -1, 0 o 1.",
                 node.OriginToken.Line,node.OriginToken.Position);
-                state.DrawCircle(dix, diy, r);
+                try
+                {
+                     state.DrawCircle(dix, diy, r);
+                }
+                catch
+                {
+                  throw new ErrorException("Walle fuera del canvas",node.OriginToken.Line,node.OriginToken.Position);
+                }
                 break;
 
             case "Fill":
                 ExpectTypes(node,args); // no se espera ningún argumento
                 state.FillFrom(state.X, state.Y, state.Canvas[state.X, state.Y]);
                 break;
-
+            case "MoveWalle":
+                ExpectTypes(node, args, typeof(int), typeof(int));
+                int newX = Convert.ToInt32(args[0]);
+                int newY = Convert.ToInt32(args[1]);
+                try
+                {
+                    state.IsInside(newX, newY);
+                }
+                catch
+                {
+                     throw new ErrorException("Posición inválida",node.OriginToken.Line,node.OriginToken.Position);
+                }
+                state.X = newX;
+                state.Y = newY;
+                break;
             default:
                 throw new Exception($"Instrucción desconocida: {node.InstructionName}");
         }

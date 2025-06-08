@@ -40,7 +40,7 @@ public class WallEState
         // Pintar el punto de inicio
         SetBrushPixels(X, Y);
 
-        for (int i = 1; i <=length; i++)
+        for (int i = 1; i <= length; i++)
         {
             X += dx;
             Y += dy;
@@ -54,6 +54,9 @@ public class WallEState
                 SetPixel(X, Y);
             }
         }
+        IsInside(X, Y);
+    
+        ;
     }
 
     public void FillFrom(int x, int y, string targetColor)
@@ -75,7 +78,8 @@ public class WallEState
         // 1) Avanza distance pasos
         X += dx * distance;
         Y += dy * distance;
-        
+        IsInside(X, Y);
+
         // 2) Calcula semianchos en cada eje (width,height impares o pares funcionan)
         int halfW = width / 2;
         int halfH = height / 2;
@@ -95,51 +99,62 @@ public class WallEState
             SetBrushPixels(X + halfW, Y + offsetY);  // borde derecho
         }
     }
-   public void DrawCircle(int dx, int dy, int radius)
-{
-    // 1) Avanza radius pasos en la dirección (dx, dy)
-    X += dx * radius;
-    Y += dy * radius;
-
-    // 2) Dibuja la circunferencia de radio 'radius' centrada en (X, Y)
-    MidpointCircle(X, Y, radius);
-}
-
-private void MidpointCircle(int cx, int cy, int r)
-{
-    int x = r+1;
-    int y = 0;
-    int err = 1 -r;
-
-    while (x >= y)
+    public void DrawCircle(int dx, int dy, int radius)
     {
-        // pinta los 8 puntos simétricos
-        SetBrushPixels(cx + x, cy + y);
-        SetBrushPixels(cx + y, cy + x);
-        SetBrushPixels(cx - y, cy + x);
-        SetBrushPixels(cx - x, cy + y);
-        SetBrushPixels(cx - x, cy - y);
-        SetBrushPixels(cx - y, cy - x);
-        SetBrushPixels(cx + y, cy - x);
-        SetBrushPixels(cx + x, cy - y);
+        // 1) Avanza radius pasos en la dirección (dx, dy)
+        X += dx * radius;
+        Y += dy * radius;
+        IsInside(X, Y);
 
-        y++;
-        if (err < 0)
+        // 2) Dibuja la circunferencia de radio 'radius' centrada en (X, Y)
+        MidpointCircle(X, Y, radius);
+    }
+
+    private void MidpointCircle(int cx, int cy, int r)
+    {
+        int x = r + 1;
+        int y = 0;
+        int err = 1 - r;
+
+        while (x >= y)
         {
-            err += 2 * y + 1;
-        }
-        else
-        {
-            x--;
-            err += 2 * (y - x + 1);
+            // pinta los 8 puntos simétricos
+            SetBrushPixels(cx + x, cy + y);
+            SetBrushPixels(cx + y, cy + x);
+            SetBrushPixels(cx - y, cy + x);
+            SetBrushPixels(cx - x, cy + y);
+            SetBrushPixels(cx - x, cy - y);
+            SetBrushPixels(cx - y, cy - x);
+            SetBrushPixels(cx + y, cy - x);
+            SetBrushPixels(cx + x, cy - y);
+
+            y++;
+            if (err < 0)
+            {
+                err += 2 * y + 1;
+            }
+            else
+            {
+                x--;
+                err += 2 * (y - x + 1);
+            }
         }
     }
-}
     private void SetBrushPixels(int px, int py)
-{
-    int off = BrushSize / 2;
-    for (int dx = -off; dx <= off; dx++)
-        for (int dy = -off; dy <= off; dy++)
-            SetPixel(px + dx, py + dy);
+    {
+        int off = BrushSize / 2;
+        for (int dx = -off; dx <= off; dx++)
+            for (int dy = -off; dy <= off; dy++)
+                SetPixel(px + dx, py + dy);
+    }
+
+    public void IsInside(int x, int y)
+    {
+        if (x < 0 || y < 0 || x >= CanvasSize || y >= CanvasSize)
+        {
+            throw new Exception();
+    }
+
+    }
 }
-}
+ 

@@ -21,8 +21,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -22.0
-offset_bottom = -21.0
+offset_left = -2.0
+offset_top = 1.0
+offset_right = -2.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.296923, 0.066574, 0.0996653, 1)
@@ -69,7 +71,7 @@ text = "Run"
 [node name="SaveButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 315.0
-offset_top = 25.0
+offset_top = 22.0
 offset_right = 443.0
 offset_bottom = 79.0
 text = "Save"
@@ -84,12 +86,18 @@ text = "Load"
 
 [node name="SpinBox" type="SpinBox" parent="."]
 layout_mode = 0
-offset_left = 1174.0
-offset_top = 21.0
-offset_right = 1340.0
-offset_bottom = 78.0
+offset_left = 1094.0
+offset_top = 19.0
+offset_right = 1260.0
+offset_bottom = 76.0
 min_value = 1.0
 max_value = 256.0
 value = 32.0
 
-[node name="FileDialog" type="FileDialog" parent="."]
+[node name="ResetButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1422.0
+offset_top = 23.0
+offset_right = 1572.0
+offset_bottom = 76.0
+text = "Reset"
