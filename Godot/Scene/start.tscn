@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=3 uid="uid://bpmtb6igmlf0t"]
+
+[ext_resource type="Script" uid="uid://b7hvvewh8q1ni" path="res://Scene/Start.cs" id="1_c1jx1"]
+[ext_resource type="Texture2D" uid="uid://buxvv1cfxrsw6" path="res://Imagenes/Wall E.jpeg" id="1_tvf0n"]
+[ext_resource type="FontFile" uid="uid://bvamboe03ncf6" path="res://Fuente/Pixel NES.otf" id="2_tvf0n"]
+[ext_resource type="AudioStream" uid="uid://75hdfa3prn6c" path="res://Audio/001 - Led Zeppelin - Stairway To Heaven.mp3" id="4_4j8re"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c1jx1"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tvf0n"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_44wi4"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="start" type="Node2D"]
+script = ExtResource("1_c1jx1")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_tvf0n")
+
+[node name="Exit" type="Button" parent="."]
+offset_left = 109.0
+offset_top = 593.0
+offset_right = 408.0
+offset_bottom = 694.0
+theme_override_colors/font_color = Color(0.678431, 0.513726, 0.0745098, 1)
+theme_override_fonts/font = ExtResource("2_tvf0n")
+theme_override_font_sizes/font_size = 70
+theme_override_styles/normal = SubResource("StyleBoxFlat_c1jx1")
+text = "Exit"
+
+[node name="Start" type="Button" parent="."]
+offset_left = 111.0
+offset_top = 437.0
+offset_right = 363.0
+offset_bottom = 542.0
+theme_override_colors/font_color = Color(0.678497, 0.512633, 0.0753097, 1)
+theme_override_fonts/font = ExtResource("2_tvf0n")
+theme_override_font_sizes/font_size = 80
+theme_override_styles/hover = SubResource("StyleBoxFlat_tvf0n")
+theme_override_styles/normal = SubResource("StyleBoxFlat_44wi4")
+text = "Start"
+
+[node name="PixelWall-E" type="TextEdit" parent="."]
+offset_left = 503.0
+offset_top = 74.0
+offset_right = 1207.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color(0.888909, 0.489594, 0.326296, 1)
+theme_override_fonts/font = ExtResource("2_tvf0n")
+theme_override_font_sizes/font_size = 80
+text = "PIXEL WALL-E"
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_4j8re")

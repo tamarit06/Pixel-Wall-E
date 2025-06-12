@@ -20,6 +20,7 @@ public partial class Main : Control
 	Image image;
 	ImageTexture texture;
 	TextureRect textureRect;
+    TextureRect walle;
 	public override void _Ready()
 	{
 		colorRect = GetNode<ColorRect>("ColorRect");
@@ -31,6 +32,7 @@ public partial class Main : Control
 		loadButton = GetNode<Button>("LoadButton");
 		resetButton = GetNode<Button>("ResetButton");
 		spinBox = GetNode<SpinBox>("SpinBox");
+        walle = GetNode<TextureRect>("Walle");
 
 		
 
@@ -119,12 +121,12 @@ public partial class Main : Control
         archivo.Close();
         codeEdit.SetText(contenido);
     }
-	private void InicializarCanvas()
-	{
-		image = Image.CreateEmpty(BoardPixelsSize, BoardPixelsSize, false, Image.Format.Rgba8);
-		image.Fill(Colors.White);
-		texture = ImageTexture.CreateFromImage(image);
-		textureRect.Texture = texture;
+    private void InicializarCanvas()
+    {
+        image = Image.CreateEmpty(BoardPixelsSize, BoardPixelsSize, false, Image.Format.Rgba8);
+        image.Fill(Colors.White);
+        texture = ImageTexture.CreateFromImage(image);
+        textureRect.Texture = texture;
 	}
 
 	// Función para pintar una celda completa en el canvas
@@ -148,29 +150,41 @@ public partial class Main : Control
 		texture.Update(image);
 	}
 	public void PintarCuadrícula()
-	{
-		int divisions = Dimension;
-		float cellSizeF = (float)BoardPixelsSize / divisions;
+    {
+        Color gridColor = Colors.Black;
+        int divs = Dimension;
+        int baseW =  BoardPixelsSize / divs;
+        int remW =  BoardPixelsSize % divs;
+        int baseH =  BoardPixelsSize / divs;
+        int remH =  BoardPixelsSize % divs;
 
-		for (int i = 0; i <= divisions; i++)
-		{
-			int pos = (int)(i * cellSizeF);
+        // Acumulamos posiciones de línea en X
+        int xPos = 0;
+        for (int i = 0; i <= divs; i++)
+        {
+            // Dibujo una línea vertical 1px de ancho en xPos
+            var lineV = new Rect2I(new Vector2I(xPos, 0), new Vector2I(1,  BoardPixelsSize));
+            image.FillRect(lineV, gridColor);
 
-			// Si pos es igual a BoardPixelSize, lo ajustamos al último índice válido (899).
-			if (pos >= BoardPixelsSize)
-				pos = BoardPixelsSize - 1;
+            // Incremento xPos: para i<divs avanzo ancho de celda i
+            if (i < divs)
+                xPos += (i < remW) ? (baseW + 1) : baseW;
+        }
 
-			// Línea vertical
-			for (int y = 0; y < BoardPixelsSize; y++)
-				image.SetPixel(pos, y, Colors.Black);
+        // Acumulamos posiciones de línea en Y
+        int yPos = 0;
+        for (int j = 0; j <= divs; j++)
+        {
+            var lineH = new Rect2I(new Vector2I(0, yPos), new Vector2I( BoardPixelsSize, 1));
+            image.FillRect(lineH, gridColor);
 
-			// Línea horizontal
-			for (int x = 0; x < BoardPixelsSize; x++)
-				image.SetPixel(x, pos, Colors.Black);
-		}
+            if (j < divs)
+                yPos += (j < remH) ? (baseH + 1) : baseH;
+        }
 
-		texture.Update(image);
-	}
+        texture.Update(image);
+        textureRect.Texture = texture;
+    }
 	private void Reset()
 	{
 		image.Fill(Colors.White);
@@ -227,36 +241,65 @@ private void ShowErrors(IEnumerable<string> errores)
         textEdit.Text += $"• {msg}\n";
 }
 
-	
+	private void Print(WallEState canvas)
+    {
+        var pixels = canvas.Canvas;
+        int divs = Dimension;
+        int baseW =  BoardPixelsSize / divs;
+        int remW =  BoardPixelsSize % divs;
+        int baseH =  BoardPixelsSize / divs;
+        int remH =  BoardPixelsSize % divs;
 
-	public void Print(WallEState canvas)
-	{
-		// Asegurarnos de que el estado lógico coincida con la dimensión actual
-		// canvas.CanvasSize = Dimension;
+        int yPos = 0;
+        for (int y = 0; y < divs; y++)
+        {
+            // Altura de esta fila:
+            int rowHeight = (y < remH) ? baseH + 1 : baseH;
 
-		// Limpiar el canvas visual antes de pintar
-		Reset();
+            int xPos = 0;
+            for (int x = 0; x < divs; x++)
+            {
+                int colWidth = (x < remW) ? baseW + 1 : baseW;
+                var rect = new Rect2I(new Vector2I(xPos, yPos), new Vector2I(colWidth, rowHeight));
 
-		// Recorrer cada celda lógica y pintarla
-		for (int x = 0; x < Dimension; x++)
-		{
-			for (int y = 0; y < Dimension; y++)
-			{
-				// Obtener el nombre del color desde el estado lógico
-				string color = canvas.Canvas[x, y];
-				// Convertirlo a un Color de Godot
-				if (color == "Transparent") continue;
-				if (x == canvas.X && y == canvas.Y)
-				{
-					PintarCelda(x, y, new Color("Pink"));
-					continue;
-				}
-				// Pintar la celda en pantalla
-				PintarCelda(x, y, new Color(color));
-			}
+                string color = pixels[x, y].ToString();
+                if (canvas.X == x && canvas.Y == y)
+                {
+                   var iconTexture = GD.Load<Texture2D>("res://Imagenes/WallE.png");
+                    if (iconTexture is null)
+                        GD.Print("No se cargo la imagen");
 
-		}
-		PintarCuadrícula();
+                    walle.Texture = iconTexture;
 
-	}
+                    // 3) Ignora el tamaño de la textura a la hora de calcular el mínimo
+                    walle.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;  
+                    //    ↑ EXPAND_IGNORE_SIZE: la textura no impone un tamaño mínimo al control :contentReference[oaicite:0]{index=0}
+
+                    // 4) Escala la textura para que cubra todo el rectángulo
+                    walle.StretchMode = TextureRect.StretchModeEnum.Scale;
+
+                    walle.Size = new Vector2(colWidth, rowHeight);
+
+                    walle.Position = new Vector2(895 + yPos, 109 + xPos);
+
+                    GD.Print($"Tamaño de la textura: {walle.Size.X}x{walle.Size.Y}");
+                    GD.Print($"Posición de Wall-E: {walle.Position.X},{walle.Position.Y}");
+                    GD.Print($"Walle: ({y},{x})");
+                    
+                }
+                 else if (color != "Transparent")
+                {
+                    image.FillRect(rect, new Color(color));
+                }
+
+                xPos += colWidth;
+            }
+
+            yPos += rowHeight;
+        }
+
+        texture.Update(image);
+        textureRect.Texture = texture;
+        PintarCuadrícula();
+    }
 }

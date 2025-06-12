@@ -1,0 +1,8 @@
+Spawn(15,15)
+Color("Orange")
+DrawCircle(0,0,2)
+Color("Black")
+DrawLine(0,0,1)
+MoveWalle(15,19)
+Color("Green")
+DrawLine(0,1,8)

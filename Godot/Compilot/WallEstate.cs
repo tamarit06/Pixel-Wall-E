@@ -55,8 +55,6 @@ public class WallEState
             }
         }
         IsInside(X, Y);
-    
-        ;
     }
 
     public void FillFrom(int x, int y, string targetColor)

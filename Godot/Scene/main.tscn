@@ -35,6 +35,7 @@ offset_left = 71.0
 offset_top = 96.0
 offset_right = 852.0
 offset_bottom = 733.0
+text = "Spawn(0,0)"
 syntax_highlighter = SubResource("CodeHighlighter_rlixt")
 gutters_draw_breakpoints_gutter = true
 gutters_draw_bookmarks = true
@@ -49,16 +50,17 @@ auto_brace_completion_highlight_matching = true
 layout_mode = 0
 offset_left = 76.0
 offset_top = 745.0
-offset_right = 861.0
+offset_right = 851.0
 offset_bottom = 878.0
 
 [node name="TextureRect" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(800, 800)
 layout_mode = 0
-offset_left = 894.0
-offset_top = 99.0
-offset_right = 1881.0
-offset_bottom = 899.0
+offset_left = 895.0
+offset_top = 109.0
+offset_right = 1882.0
+offset_bottom = 909.0
+metadata/_edit_use_anchors_ = true
 
 [node name="RunButton" type="Button" parent="."]
 layout_mode = 0
@@ -66,6 +68,7 @@ offset_left = 115.0
 offset_top = 23.0
 offset_right = 240.0
 offset_bottom = 82.0
+theme_override_font_sizes/font_size = 40
 text = "Run"
 
 [node name="SaveButton" type="Button" parent="."]
@@ -74,6 +77,7 @@ offset_left = 315.0
 offset_top = 22.0
 offset_right = 443.0
 offset_bottom = 79.0
+theme_override_font_sizes/font_size = 40
 text = "Save"
 
 [node name="LoadButton" type="Button" parent="."]
@@ -82,6 +86,7 @@ offset_left = 502.0
 offset_top = 25.0
 offset_right = 640.0
 offset_bottom = 75.0
+theme_override_font_sizes/font_size = 40
 text = "Load"
 
 [node name="SpinBox" type="SpinBox" parent="."]
@@ -100,4 +105,10 @@ offset_left = 1422.0
 offset_top = 23.0
 offset_right = 1572.0
 offset_bottom = 76.0
+theme_override_font_sizes/font_size = 40
 text = "Reset"
+
+[node name="Walle" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
