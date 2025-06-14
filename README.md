@@ -22,11 +22,13 @@
    - 🖱️ ¡Haz doble clic en `PixelWallE.exe` y comienza a crear tu arte!
 
 2. **Interfaz de usuario**
-   - ▶️ **Run**: Para compilar el código y que Wall-E pinte en el canvas según tus instrucciones, escribe el código en el editor y presiona el botón **Run**.
-   - 💾 **Save**: Para guardar tus códigos y creaciones, utiliza el botón **Save**. Esto exportará tu código a un archivo `.pw`.
-   - 📂 **Load**: Para cargar archivos existentes en formato `.pw`, utiliza el botón **Load** y selecciona tu archivo.
-   - 🧹 **Reset**: Para limpiar y reiniciar el canvas, presiona el botón **Reset**.
-   - 📏 **Dimensión del canvas**: Puedes cambiar la dimensión del canvas desde 1 hasta 256 para adaptar el espacio de dibujo.
+
+- ▶️ **Run**: Para compilar el código y que Wall-E pinte en el canvas según tus instrucciones, escribe el código en el editor y presiona el botón **Run**.
+- 💾 **Save**: Para guardar tus códigos y creaciones, utiliza el botón **Save**. Esto exportará tu código a un archivo `.pw`.
+- 📂 **Load**: Para cargar archivos existentes en formato `.pw`, utiliza el botón **Load** y selecciona tu archivo.
+- 🧹 **Reset**: Para limpiar y reiniciar el canvas, presiona el botón **Reset**.
+- ⬇️ **Download**: Para guardar la imagen generada en el canvas como un archivo de imagen, haz clic en este botón.
+- 📏 **Dimensión del canvas**: Puedes cambiar la dimensión del canvas desde 1 hasta 256 para adaptar el espacio de dibujo.
 
 ---
 
