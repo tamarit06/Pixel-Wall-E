@@ -172,7 +172,11 @@ El código fuente principal del compilador está en el archivo
 `Godot/Scripts/Main.cs`, acompañado por las clases auxiliares `Lexer`, `Parser` y `Evaluate`.
 
 ---
-
+## Captura de Pantalla
+![Pantalla de Inicio](Godot/Imagenes/cap1.png)
+![Dibujo](Godot/Imagenes/cap2.png)
+![Dubujo](Godot/Imagenes/cap3.png)
+![Dubujo](Godot/Imagenes/cap4.png)
 ## 🙌 Créditos
 
 Proyecto realizado por **Lianet Tamarit Tejas**  
