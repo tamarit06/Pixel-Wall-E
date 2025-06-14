@@ -16,11 +16,11 @@ public partial class Main : Control
 	FileDialog fileDialogSave;
 	FileDialog fileDialogLoad;
 	public int Dimension = 32;
-	public const int BoardPixelsSize = 800;
+	public const int BoardPixelsSize = 900;
 	Image image;
 	ImageTexture texture;
 	TextureRect textureRect;
-    TextureRect walle;
+	TextureRect walle;
 	public override void _Ready()
 	{
 		colorRect = GetNode<ColorRect>("ColorRect");
@@ -32,10 +32,8 @@ public partial class Main : Control
 		loadButton = GetNode<Button>("LoadButton");
 		resetButton = GetNode<Button>("ResetButton");
 		spinBox = GetNode<SpinBox>("SpinBox");
-        walle = GetNode<TextureRect>("Walle");
-
+		walle = GetNode<TextureRect>("TextureRect/Walle");
 		
-
 		runButton.Pressed += OnRunPressed;
 		saveButton.Pressed += OnSavePressed;
 		loadButton.Pressed += OnLoadPressed;
@@ -121,12 +119,13 @@ public partial class Main : Control
         archivo.Close();
         codeEdit.SetText(contenido);
     }
-    private void InicializarCanvas()
-    {
-        image = Image.CreateEmpty(BoardPixelsSize, BoardPixelsSize, false, Image.Format.Rgba8);
-        image.Fill(Colors.White);
-        texture = ImageTexture.CreateFromImage(image);
-        textureRect.Texture = texture;
+	private void InicializarCanvas()
+	{
+		image = Image.CreateEmpty(BoardPixelsSize, BoardPixelsSize, false, Image.Format.Rgba8);
+		image.Fill(Colors.White);
+		texture = ImageTexture.CreateFromImage(image);
+		textureRect.Texture = texture;
+		textureRect.Size = new Vector2(BoardPixelsSize, BoardPixelsSize);
 	}
 
 	// Función para pintar una celda completa en el canvas
@@ -182,13 +181,14 @@ public partial class Main : Control
                 yPos += (j < remH) ? (baseH + 1) : baseH;
         }
 
-        texture.Update(image);
-        textureRect.Texture = texture;
-    }
+		texture.Update(image);
+	}
 	private void Reset()
 	{
 		image.Fill(Colors.White);
 		texture.Update(image);
+		walle.Visible = false;
+
 	}
 
 	public void Compiler()
@@ -263,34 +263,34 @@ private void ShowErrors(IEnumerable<string> errores)
                 var rect = new Rect2I(new Vector2I(xPos, yPos), new Vector2I(colWidth, rowHeight));
 
                 string color = pixels[x, y].ToString();
-                if (canvas.X == x && canvas.Y == y)
-                {
-                   var iconTexture = GD.Load<Texture2D>("res://Imagenes/WallE.png");
-                    if (iconTexture is null)
-                        GD.Print("No se cargo la imagen");
+				if (canvas.X == x && canvas.Y == y)
+				{
+					var iconTexture = GD.Load<Texture2D>("res://Imagenes/WallE.png");
+					if (iconTexture is null)
+						GD.Print("No se cargo la imagen");
 
-                    walle.Texture = iconTexture;
+					walle.Texture = iconTexture;
 
-                    // 3) Ignora el tamaño de la textura a la hora de calcular el mínimo
-                    walle.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;  
-                    //    ↑ EXPAND_IGNORE_SIZE: la textura no impone un tamaño mínimo al control :contentReference[oaicite:0]{index=0}
+					walle.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+					walle.StretchMode = TextureRect.StretchModeEnum.Scale;
 
-                    // 4) Escala la textura para que cubra todo el rectángulo
-                    walle.StretchMode = TextureRect.StretchModeEnum.Scale;
 
-                    walle.Size = new Vector2(colWidth, rowHeight);
+					walle.Position = new Vector2(xPos, yPos);
 
-                    walle.Position = new Vector2(895 + yPos, 109 + xPos);
+					walle.Size = new Vector2(colWidth, rowHeight);
+					walle.Visible = true;
 
-                    GD.Print($"Tamaño de la textura: {walle.Size.X}x{walle.Size.Y}");
-                    GD.Print($"Posición de Wall-E: {walle.Position.X},{walle.Position.Y}");
-                    GD.Print($"Walle: ({y},{x})");
+					GD.Print($"Posicion del rectangulo: ({rect.Position.X},{rect.Position.Y})");
+					GD.Print($"Posición de Wall-E: {walle.Position.X},{walle.Position.Y}");
+					GD.Print($"Walle: ({y},{x})");
+                    GD.Print($"Tamanno del texturerect: ({textureRect.Size.X},{textureRect.Size.Y})");
+					
                     
                 }
-                 else if (color != "Transparent")
-                {
-                    image.FillRect(rect, new Color(color));
-                }
+				if (color != "Transparent")
+				{
+					image.FillRect(rect, new Color(color));
+				}
 
                 xPos += colWidth;
             }
@@ -302,4 +302,5 @@ private void ShowErrors(IEnumerable<string> errores)
         textureRect.Texture = texture;
         PintarCuadrícula();
     }
+	
 }

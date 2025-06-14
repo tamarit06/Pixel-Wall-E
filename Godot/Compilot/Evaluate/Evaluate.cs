@@ -151,7 +151,17 @@ public class Evaluate : IVisitor<object>
 
             case "Fill":
                 ExpectTypes(node,args); // no se espera ningún argumento
-                state.FillFrom(state.X, state.Y, state.Canvas[state.X, state.Y]);
+                try
+                {
+                    state.IsInside(state.X, state.Y);
+                    state.FillFrom(state.X, state.Y, state.Canvas[state.X, state.Y]);
+                }
+                catch
+                {
+
+                    throw new ErrorException("Walle fuera del canvas", node.OriginToken.Line, node.OriginToken.Position);
+                }
+              
                 break;
             case "MoveWalle":
                 ExpectTypes(node, args, typeof(int), typeof(int));

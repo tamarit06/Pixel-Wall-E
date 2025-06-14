@@ -36,7 +36,7 @@ public class Parser
 
     public void Parsind()
     {
-         Errores.Clear();
+        Errores.Clear();
         Nodos.Clear();
 
         // Verificar que comienza con Spawn
@@ -63,7 +63,7 @@ public class Parser
         // Parsear el resto de las instrucciones
         while (!IsAtEnd)
         {
-            if (Check(TokenType.EOL))
+            if (Check(TokenType.EOL) || Check(TokenType.EOF))
             {
                 Advance(); // Saltar líneas vacías
                 continue;

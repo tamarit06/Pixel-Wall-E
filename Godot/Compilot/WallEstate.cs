@@ -24,11 +24,6 @@ public class WallEState
         }
     }
 
-    private bool EsValido(int x, int y)
-    {
-        return x >= 0 && y >= 0 && x < CanvasSize && y < CanvasSize;
-    }
-
     public void SetPixel(int x, int y)
     {
         if (x >= 0 && x < CanvasSize && y >= 0 && y < CanvasSize)
@@ -44,19 +39,16 @@ public class WallEState
         {
             X += dx;
             Y += dy;
-            if (i < length)
-            {
+            
                 SetBrushPixels(X, Y);
-            }
-
-            else
-            {
-                SetPixel(X, Y);
-            }
+        
         }
         IsInside(X, Y);
     }
-
+ private bool EsValido(int x, int y)
+    {
+        return x >= 0 && y >= 0 && x < CanvasSize && y < CanvasSize;
+    }
     public void FillFrom(int x, int y, string targetColor)
     {
         if (!EsValido(x, y) || Canvas[x, y] != targetColor || Canvas[x, y] == BrushColor)
