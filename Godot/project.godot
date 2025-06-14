@@ -10,10 +10,10 @@ config_version=5
 
 [application]
 
-config/name="Nuevo Proyecto de Juego"
+config/name="Pixel Wall-E"
 run/main_scene="uid://bpmtb6igmlf0t"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://cyac8dyx1vbno"
 
 [display]
 

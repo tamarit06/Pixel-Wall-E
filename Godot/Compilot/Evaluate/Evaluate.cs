@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Godot;
 public class Evaluate : IVisitor<object>
 {
      private WallEState state;
@@ -86,9 +87,10 @@ public class Evaluate : IVisitor<object>
             case "Size":
                 ExpectTypes(node,args, typeof(int));
                 int size = Convert.ToInt32(args[0]);
-                if (size % 2 == 0 || size < 1)
-                throw new ErrorException("El tamaño de la brocha debe ser un número impar mayor o igual que 1.",
-                node.OriginToken.Line,node.OriginToken.Position);
+                if (size % 2 == 0) size = size - 1;
+                if (size < 1)
+                    throw new ErrorException("El tamaño de la brocha debe ser un número impar mayor o igual que 1.",
+                    node.OriginToken.Line, node.OriginToken.Position);
                 state.BrushSize = size;
                 break;
             
@@ -337,6 +339,7 @@ public class Evaluate : IVisitor<object>
                         }
                     }
                 }
+                GD.Print($"Get Color {count}");
                 return count;
 
             case "IsBrushColor":
@@ -358,7 +361,7 @@ public class Evaluate : IVisitor<object>
                 int x = state.X + h;
                 int y = state.Y + v;
                 if (!EsValido(x, y)) return false;
-                if (state.Canvas[x, y] == col) return 1;
+                if (state.Canvas[x, y] == col)return 1;
                 return 0;
 
             default:

@@ -1,4 +1,4 @@
- Spawn(16,16)
+ Spawn(31,31)
  Color("Blue")
 DrawLine(1,0,2)
 DrawLine(0,-1,2)
@@ -11,4 +11,4 @@ DrawLine(0,1,y)
 DrawLine(1,0,y+2)
 DrawLine(0,-1,y+2)
 y<-y+4
-GoTo[inicio](i<6)
+GoTo[inicio](i<14)

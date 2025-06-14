@@ -71,8 +71,8 @@ public class WallEState
         IsInside(X, Y);
 
         // 2) Calcula semianchos en cada eje (width,height impares o pares funcionan)
-        int halfW = width / 2;
-        int halfH = height / 2;
+        int halfW = width / 2 +1;
+        int halfH = height / 2+1;
 
         // 3) Dibuja borde superior e inferior
         for (int offsetX = -halfW; offsetX <= halfW; offsetX++)

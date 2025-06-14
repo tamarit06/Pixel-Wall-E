@@ -15,7 +15,7 @@ public partial class Main : Control
 	SpinBox spinBox;
 	FileDialog fileDialogSave;
 	FileDialog fileDialogLoad;
-	public int Dimension = 32;
+	public int Dimension = 25;
 	public const int BoardPixelsSize = 900;
 	Image image;
 	ImageTexture texture;
@@ -33,7 +33,7 @@ public partial class Main : Control
 		resetButton = GetNode<Button>("ResetButton");
 		spinBox = GetNode<SpinBox>("SpinBox");
 		walle = GetNode<TextureRect>("TextureRect/Walle");
-		
+
 		runButton.Pressed += OnRunPressed;
 		saveButton.Pressed += OnSavePressed;
 		loadButton.Pressed += OnLoadPressed;
@@ -61,6 +61,7 @@ public partial class Main : Control
 
 		InicializarCanvas();
 		PintarCuadrícula();
+		Compiler();
 	}
 
 	public void OnRunPressed()

@@ -1,6 +1,0 @@
-Spawn(0,5)
-Color("Red")
-DrawLine(1,0,9)
-MoveWalle(4,3)
-Color("Yellow")
-Fill()
