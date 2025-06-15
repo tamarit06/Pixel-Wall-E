@@ -12,9 +12,12 @@ public partial class Main : Control
 	Button saveButton;
 	Button loadButton;
 	Button resetButton;
+	Button download;
+
 	SpinBox spinBox;
 	FileDialog fileDialogSave;
 	FileDialog fileDialogLoad;
+	FileDialog fileDialogDownload;
 	public int Dimension = 25;
 	public const int BoardPixelsSize = 900;
 	Image image;
@@ -31,6 +34,7 @@ public partial class Main : Control
 		saveButton = GetNode<Button>("SaveButton");
 		loadButton = GetNode<Button>("LoadButton");
 		resetButton = GetNode<Button>("ResetButton");
+		download = GetNode<Button>("Download");
 		spinBox = GetNode<SpinBox>("SpinBox");
 		walle = GetNode<TextureRect>("TextureRect/Walle");
 
@@ -38,6 +42,7 @@ public partial class Main : Control
 		saveButton.Pressed += OnSavePressed;
 		loadButton.Pressed += OnLoadPressed;
 		resetButton.Pressed += OnResetPressed;
+		download.Pressed += OnDownloadPressed;
 		spinBox.ValueChanged += OnSpinBoxValueChanged;
 
 		// Crear y configurar el FileDialog para guardar archivos
@@ -58,6 +63,15 @@ public partial class Main : Control
 		fileDialogLoad.Filters = new string[] { "*.gw" };
 		AddChild(fileDialogLoad);
 		fileDialogLoad.FileSelected += _OnFileDialogLoadFileSelected;
+
+		// Crear y configurar el FileDialog para descargar el canvas como PNG
+fileDialogDownload = new FileDialog();
+fileDialogDownload.Access = FileDialog.AccessEnum.Filesystem;
+fileDialogDownload.FileMode = FileDialog.FileModeEnum.SaveFile;
+fileDialogDownload.Filters = new string[] { "*.png" };
+AddChild(fileDialogDownload);
+fileDialogDownload.FileSelected += _OnFileDialogDownloadSelected;
+
 
 		InicializarCanvas();
 		PintarCuadrícula();
@@ -86,6 +100,14 @@ public partial class Main : Control
 		Reset();
 		PintarCuadrícula();
 	}
+
+
+	public void OnDownloadPressed()
+	{
+		fileDialogDownload.PopupCentered();
+		fileDialogDownload.Size = new Vector2I(600, 400);
+	}
+	
 	public void OnSpinBoxValueChanged(double newValue)
 	{
 		Reset();
@@ -104,13 +126,27 @@ public partial class Main : Control
         PintarCuadrícula();
         GD.Print("Archivo cargado desde: " + ruta);
     }
-    // Función para guardar el contenido del editor en un archivo
-    private void GuardarArchivo(string ruta)
+
+	private void _OnFileDialogDownloadSelected(string ruta)
+	{
+		var error = image.SavePng(ruta);
+
+    if (error == Error.Ok)
     {
-        var archivo = Godot.FileAccess.Open(ruta, Godot.FileAccess.ModeFlags.Write);
-        archivo.StoreString(codeEdit.GetText());
-        archivo.Close();
+        GD.Print("Canvas guardado en: " + ruta);
     }
+    else
+    {
+        GD.PrintErr("Error al guardar el canvas como imagen: " + error);
+    }
+	}
+    // Función para guardar el contenido del editor en un archivo
+	private void GuardarArchivo(string ruta)
+	{
+		var archivo = Godot.FileAccess.Open(ruta, Godot.FileAccess.ModeFlags.Write);
+		archivo.StoreString(codeEdit.GetText());
+		archivo.Close();
+	}
     // Función para cargar el contenido de un archivo en el editor
     private void CargarArchivo(string ruta)
     {

@@ -128,9 +128,9 @@ text = "Load"
 
 [node name="SpinBox" type="SpinBox" parent="."]
 layout_mode = 0
-offset_left = 1016.0
+offset_left = 1024.0
 offset_top = 8.0
-offset_right = 1144.0
+offset_right = 1152.0
 offset_bottom = 56.0
 min_value = 1.0
 max_value = 256.0
@@ -139,9 +139,19 @@ alignment = 1
 
 [node name="ResetButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 1224.0
+offset_left = 1216.0
 offset_top = 8.0
-offset_right = 1352.0
+offset_right = 1344.0
 offset_bottom = 56.0
 theme_override_font_sizes/font_size = 25
 text = "Reset"
+
+[node name="Download" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1408.0
+offset_top = 8.0
+offset_right = 1536.0
+offset_bottom = 56.0
+theme_override_font_sizes/font_size = 20
+text = "DownLoad
+"
